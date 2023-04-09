@@ -89,7 +89,16 @@ The specified application directory has been initially configured
 		deploy init \path\to\app
 `,
 				UsageText: `deploy init [\path\to\app]`,
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:        "a",
+						DefaultText: "false",
+						Usage:       "All configurations",
+					},
+				},
 				Action: func(ctx *cli.Context) (err error) {
+
+					isAllConfig := ctx.Bool("a")
 
 					appath := ctx.Args().First()
 					if appath == "" {
@@ -113,6 +122,19 @@ The specified application directory has been initially configured
 						Password:  "your_password",
 						SrcFile:   "your need to deploy file",
 						TargetDir: "remote target dir",
+					}
+
+					if isAllConfig {
+						config = deploy.DeployConfig{
+							Address:   "localhost:22",
+							Username:  "your_username",
+							Password:  "your_password",
+							Timeout:   10,
+							SrcFile:   "your need to deploy file",
+							TargetDir: "remote target dir",
+							PreCmd:    []string{"Before uploading a file"},
+							PostCmd:   []string{"After uploading the file"},
+						}
 					}
 
 					//写入配置文件
