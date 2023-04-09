@@ -43,8 +43,12 @@ jobs:
     - name: Build
       run: go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w" main.go
     
+    - name: Test
+      if: ${{ matrix.goexe == '.exe' }}
+      run: ./release/deploy${{ matrix.goexe }} -h
+    
     - name: Package
-      run: cd release && tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
+      run: cd release && tar -cvzf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
     
     - name: Deploy
       uses: softprops/action-gh-release@v1
