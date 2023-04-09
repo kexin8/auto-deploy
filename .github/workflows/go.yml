@@ -43,10 +43,6 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
     
-    - name: Test
-      if: ${{ matrix.goexe == '.exe' }}
-      run: ./release/deploy${{ matrix.goexe }} -h
-    
     - name: Package
       run: cd release && tar -cvzf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
     
@@ -61,3 +57,11 @@ jobs:
         prerelease: false
         token: ${{ github.token }}
         files: release/deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz 
+  
+  test-windows:
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - name: test
+      run: ./release/deploy.exe -h
+    
