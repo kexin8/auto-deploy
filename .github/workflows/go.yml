@@ -12,7 +12,7 @@ on:
 jobs:
   
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     strategy:
@@ -33,7 +33,7 @@ jobs:
       with:
         go-version-file: 'go.mod'
       env:
-#        CGO_ENABLED: 0
+        CGO_ENABLED: 0
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
     
