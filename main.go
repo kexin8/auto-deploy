@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/kexin8/auto-deploy/deploy"
+	"github.com/kexin8/auto-deploy/deployment"
 	"github.com/kexin8/auto-deploy/log"
 	"github.com/urfave/cli/v2"
 	"io"
@@ -19,14 +19,14 @@ const (
 
 func main() {
 	app := &cli.App{
-		Name: "deploy",
+		Name: "deployment",
 		Description: `This is a simple cli app that automates deployment.
 e.g. This is a common way to perform deployment, according to dyconfig.json in the current path
-	deploy
+	deployment
 This is manually specifying the configuration file
-	deploy \path\to\config.json`,
+	deployment \path\to\config.json`,
 		Usage:     "this is a simple cli app that automates deployment",
-		UsageText: `deploy [\path\to\config.json]`,
+		UsageText: `deployment [\path\to\config.json]`,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:        "debug",
@@ -49,7 +49,7 @@ This is manually specifying the configuration file
 				_, err := os.Stat(defConfigName)
 				if err != nil {
 					if os.IsNotExist(err) {
-						return cli.Exit("dyconfig.json does not exist, please use 'deploy init' to initialize", -1)
+						return cli.Exit("dyconfig.json does not exist, please use 'deployment init' to initialize", -1)
 					}
 					return err
 				}
@@ -57,7 +57,7 @@ This is manually specifying the configuration file
 			}
 
 			//读取配置文件
-			config, err := deploy.ReadConfig(profile)
+			config, err := deployment.ReadConfig(profile)
 			if err != nil {
 				return cli.Exit(fmt.Sprintf("read config file %s failed : %s", profile, err), -1)
 			}
@@ -84,11 +84,11 @@ This is manually specifying the configuration file
 				Name: "init",
 				Description: `Initialize a new deployment configuration file.
 e.g. The usual way to config an app
-		deploy init
+		deployment init
 The specified application directory has been initially configured
-		deploy init \path\to\app
+		deployment init \path\to\app
 `,
-				UsageText: `deploy init [\path\to\app]`,
+				UsageText: `deployment init [\path\to\app]`,
 				Action: func(ctx *cli.Context) (err error) {
 
 					appath := ctx.Args().First()
@@ -107,11 +107,11 @@ The specified application directory has been initially configured
 
 					//fmt.Println("appath:" + appath)
 
-					config := deploy.DeployConfig{
+					config := deployment.DeployConfig{
 						Address:   "localhost:22",
 						Username:  "your_username",
 						Password:  "your_password",
-						SrcFile:   "your need to deploy file",
+						SrcFile:   "your need to deployment file",
 						TargetDir: "remote target dir",
 					}
 

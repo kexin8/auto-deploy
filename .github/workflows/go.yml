@@ -31,7 +31,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: 1.19
+        go-version: 1.20
       env:
         CGO_ENABLED: 0
         GOOS: ${{ matrix.goos }}
@@ -44,7 +44,7 @@ jobs:
       run: go build -v -o deploy${{ matrix.goexe }} -ldflags "-s -w" main.go
     
     - name: Package
-      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz --exclude=deploy deploy* README.md
+      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* README.md
     
     - name: Deploy
       uses: softprops/action-gh-release@v1
