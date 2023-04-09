@@ -41,10 +41,10 @@ jobs:
       run: go get .
     
     - name: Build
-      run: go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w" main.go && cd release
+      run: go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w" main.go && cd release && ls -l
     
     - name: Package
-      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
+      run: pwd && tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
     
     - name: Deploy
       uses: softprops/action-gh-release@v1
