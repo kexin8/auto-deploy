@@ -13,6 +13,8 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         include:
@@ -52,6 +54,5 @@ jobs:
         body: TODO New Release.
         draft: false
         prerelease: false
-        files: |
-          deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
-          LICENSE 
+        token: ${{ github.token }}
+        files: deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz 
