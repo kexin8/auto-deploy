@@ -1,0 +1,57 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  label:
+    types:
+      - created
+      - edited
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goarch: amd64
+            goos: linux
+          - goarch: amd64
+            goos: darwin
+          - goarch: amd64
+          - goos: windows
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+    
+    - name: Install
+      run: go get .
+    
+    - name: Build
+      run: go build -v -o deploy.exe -ldflags "-s -w" main.go
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+    
+    - name: Package
+      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* README.md
+    
+    - name: Deploy
+      if: ${{ !env.ACT }}
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
+        asset_name: deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
+        asset_content_type: application/gzip
