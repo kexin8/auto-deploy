@@ -72,7 +72,7 @@ This is manually specifying the configuration file
 			if err == nil {
 				//filename DEPLOY					SUCCESS
 				green := color.New(color.FgGreen).SprintFunc()
-				fmt.Printf("%s DEPLOY					%s", filepath.Base(config.SrcFile), green("SUCCESS"))
+				fmt.Printf("%s DEPLOY					%s\r\n", filepath.Base(config.SrcFile), green("SUCCESS"))
 			}
 
 			fmt.Println("END.")
@@ -117,23 +117,26 @@ The specified application directory has been initially configured
 					//fmt.Println("appath:" + appath)
 
 					config := deploy.Config{
-						Address:   "localhost:22",
-						Username:  "your_username",
-						Password:  "your_password",
-						SrcFile:   "your need to deploy file",
-						TargetDir: "remote target dir",
+						Address:       "localhost:22",
+						Username:      "your_username",
+						Password:      "your_password",
+						PublicKeyPath: "your_pubkey_path",
+						SrcFile:       "your need to deploy file",
+						TargetDir:     "remote target dir",
 					}
 
 					if isAllConfig {
 						config = deploy.Config{
-							Address:   "localhost:22",
-							Username:  "your_username",
-							Password:  "your_password",
-							Timeout:   10,
-							SrcFile:   "your need to deploy file",
-							TargetDir: "remote target dir",
-							PreCmd:    []string{"Before uploading a file"},
-							PostCmd:   []string{"After uploading the file"},
+							Address:       "localhost:22",
+							Username:      "your_username",
+							Password:      "your_password",
+							PublicKey:     "your_pubkey",
+							PublicKeyPath: "your_pubkey_path",
+							Timeout:       10,
+							SrcFile:       "your need to deploy file",
+							TargetDir:     "remote target dir",
+							PreCmd:        []string{"Before uploading a file"},
+							PostCmd:       []string{"After uploading the file"},
 						}
 					}
 

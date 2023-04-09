@@ -17,7 +17,7 @@ func (c *Config) UploadFile() (err error) {
 	//上传文件至远程服务器指定目录
 	//2.执行前置命令
 	fmt.Println("Pre command ...")
-	if err := execList(c.sshClient, c.PreCmd); err != nil {
+	if err := execList(c.sshClient, c.PreCmd...); err != nil {
 		return err
 	}
 
@@ -65,14 +65,14 @@ func (c *Config) UploadFile() (err error) {
 	fmt.Println()
 	//4.执行后置命令
 	fmt.Println("Post command ...")
-	if err := execList(c.sshClient, c.PostCmd); err != nil {
+	if err := execList(c.sshClient, c.PostCmd...); err != nil {
 		return err
 	}
 
 	return
 }
 
-func execList(client *ssh.Client, cmd []string) error {
+func execList(client *ssh.Client, cmd ...string) error {
 	for _, command := range cmd {
 		//执行命令
 		if err := exec(client, command); err != nil {

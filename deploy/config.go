@@ -12,10 +12,12 @@ import (
 )
 
 type Config struct {
-	Address  string `json:"address"`           // IP address or hostname
-	Username string `json:"username"`          // Username
-	Password string `json:"password"`          // Password
-	Timeout  int    `json:"timeout,omitempty"` // Timeout in seconds
+	Address       string `json:"address"`                 // IP address or hostname
+	Username      string `json:"username"`                // Username
+	Password      string `json:"password"`                // Password
+	PublicKey     string `json:"publicKey,omitempty"`     // PublicKey
+	PublicKeyPath string `json:"publicKeyPath,omitempty"` // PublicKeyPath
+	Timeout       int    `json:"timeout,omitempty"`       // Timeout in seconds,default 10s
 
 	//Path of the file to be uploaded
 	SrcFile string `json:"srcFile"`
@@ -39,10 +41,12 @@ func (c *Config) Init() error {
 	}
 
 	sshConf := lsftp.SSHConfig{
-		Address:  c.Address,
-		Username: c.Username,
-		Password: c.Password,
-		Timeout:  c.Timeout,
+		Address:       c.Address,
+		Username:      c.Username,
+		Password:      c.Password,
+		PublicKey:     c.PublicKey,
+		PublicKeyPath: c.PublicKeyPath,
+		Timeout:       c.Timeout,
 	}
 	sshClient, err := sshConf.NewSshClient()
 	if err != nil {
