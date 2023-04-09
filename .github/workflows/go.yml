@@ -66,7 +66,7 @@ jobs:
       contents: write
     steps:
     - name: Write install.sh script
-      run: curl https://raw.githubusercontent.com/kexin8/auto-deploy/master/install.sh.d -O install.sh && sed -i 's/{version}/${{ github.ref }}/g' install.sh
+      run: curl https://raw.githubusercontent.com/kexin8/auto-deploy/master/install.sh.d -O install.sh | sed -i 's/{version}/${{ github.ref }}/g'
       
     - name: Deploy
       uses: softprops/action-gh-release@v1
