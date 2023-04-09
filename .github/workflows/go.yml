@@ -4,8 +4,9 @@
 name: Go
 
 on:
-  label:
-    types: [created]
+  push:
+    tags:
+      - v*
 
 jobs:
   
