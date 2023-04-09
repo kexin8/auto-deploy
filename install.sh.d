@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION={version}
+VERSION="{version}"
 URL="https://github.com/kexin8/auto-deploy/releases/download/$VERSION"
 
 # 获取当前系统
