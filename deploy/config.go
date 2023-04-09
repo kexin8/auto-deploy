@@ -1,4 +1,4 @@
-package deployment
+package deploy
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ type DeployConfig struct {
 	//Path of the file to be uploaded
 	SrcFile string `json:"srcFile"`
 
-	//deployment directory
+	//deploy directory
 	TargetDir string `json:"targetDir"`
 	//Command to be executed before uploading a file
 	//e.g. "rm -rf {dir}/*"
