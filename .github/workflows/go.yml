@@ -24,7 +24,7 @@ jobs:
             goos: darwin
           - goarch: amd64
             goos: windows
-            ext: .exe
+            goexe: .exe
     steps:
     - uses: actions/checkout@v3
 
@@ -33,6 +33,7 @@ jobs:
       with:
         go-version: 1.19
       env:
+        CGO_ENABLED: 0
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}
     
@@ -40,10 +41,10 @@ jobs:
       run: go get .
     
     - name: Build
-      run: go build -v -o deploy${{ matrix.ext }} -ldflags "-s -w" main.go
+      run: go build -v -o deploy${{ matrix.goexe }} -ldflags "-s -w" main.go
     
     - name: Package
-      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* README.md
+      run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz --exclude=deploy deploy* README.md
     
     - name: Deploy
       uses: softprops/action-gh-release@v1
