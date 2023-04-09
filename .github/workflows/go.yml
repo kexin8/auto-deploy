@@ -63,5 +63,5 @@ jobs:
     needs: build
     steps:
     - name: test
-      run: ./release/deploy.exe -h
+      run: ls && ./release/deploy.exe -h
     
