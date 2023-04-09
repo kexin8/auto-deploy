@@ -6,10 +6,8 @@ name: Go
 on:
   push:
     branches: [ "master" ]
-  label:
-    types:
-      - created
-      - edited
+    tags:
+      - "v*"
 
 jobs:
   
