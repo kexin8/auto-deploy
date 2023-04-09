@@ -59,3 +59,20 @@ jobs:
         token: ${{ github.token }}
         files: release/deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz 
     
+  script:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+    - name: Write install.sh script
+      run: cp install.sh.d install.sh && sed -i 's/{version}/${{ github.ref }}/g' install.sh
+      
+    - name: Deploy
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        draft: false
+        prerelease: false
+        token: ${{ github.token }}
+        files: install.sh
