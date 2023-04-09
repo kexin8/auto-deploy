@@ -12,7 +12,7 @@ on:
 jobs:
   
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     strategy:
@@ -32,16 +32,16 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version-file: 'go.mod'
-      env:
-        CGO_ENABLED: 0
-        GOOS: ${{ matrix.goos }}
-        GOARCH: ${{ matrix.goarch }}
     
     - name: Install
       run: go get .
     
     - name: Build
       run: go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w" main.go
+      env:
+        CGO_ENABLED: 0
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
     
     - name: Test
       if: ${{ matrix.goexe == '.exe' }}
