@@ -4,10 +4,8 @@
 name: Go
 
 on:
-  push:
-    branches: [ "master" ]
-    tags:
-      - "v*"
+  label:
+    types: [created]
 
 jobs:
   
@@ -67,7 +65,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Write install.sh script
-      run: cp install.sh.d install.sh && sed -i 's/{version}/"${{ github.ref }}"/g' install.sh && cat install.sh
+      if: startsWith(github.ref, 'refs/tags/')
+      run: cp install.sh.d install.sh && sed -i 's/{version}/${{ github.ref }}/g' install.sh && cat install.sh
       
     - name: Deploy
       uses: softprops/action-gh-release@v1
