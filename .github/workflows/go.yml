@@ -32,27 +32,28 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.19
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
     
     - name: Install
       run: go get .
     
     - name: Build
       run: go build -v -o deploy${{ matrix.ext }} -ldflags "-s -w" main.go
-      env:
-        GOOS: ${{ matrix.goos }}
-        GOARCH: ${{ matrix.goarch }}
     
     - name: Package
       run: tar -czf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* README.md
     
     - name: Deploy
-      if: ${{ !env.ACT }}
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
-        asset_name: deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
-        asset_content_type: application/gzip
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        body: TODO New Release.
+        draft: false
+        prerelease: false
+        files: |
+          deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
+          LICENSE 
