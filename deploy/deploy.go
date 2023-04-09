@@ -12,7 +12,7 @@ import (
 )
 
 // UploadFile uploads a file to the remote server
-func (c *DeployConfig) UploadFile() (err error) {
+func (c *Config) UploadFile() (err error) {
 	sftpcli := c.sftpClient
 	//上传文件至远程服务器指定目录
 	//2.执行前置命令

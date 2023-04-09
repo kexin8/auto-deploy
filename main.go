@@ -116,7 +116,7 @@ The specified application directory has been initially configured
 
 					//fmt.Println("appath:" + appath)
 
-					config := deploy.DeployConfig{
+					config := deploy.Config{
 						Address:   "localhost:22",
 						Username:  "your_username",
 						Password:  "your_password",
@@ -125,7 +125,7 @@ The specified application directory has been initially configured
 					}
 
 					if isAllConfig {
-						config = deploy.DeployConfig{
+						config = deploy.Config{
 							Address:   "localhost:22",
 							Username:  "your_username",
 							Password:  "your_password",

@@ -11,7 +11,7 @@ import (
 	lsftp "github.com/kexin8/auto-deploy/sftp"
 )
 
-type DeployConfig struct {
+type Config struct {
 	Address  string `json:"address"`           // IP address or hostname
 	Username string `json:"username"`          // Username
 	Password string `json:"password"`          // Password
@@ -33,7 +33,7 @@ type DeployConfig struct {
 	sftpClient *sftp.Client
 }
 
-func (c *DeployConfig) Init() error {
+func (c *Config) Init() error {
 	if err := c.validate(); err != nil {
 		return fmt.Errorf("invalid configuration: %w", err)
 	}
@@ -61,7 +61,7 @@ func (c *DeployConfig) Init() error {
 }
 
 // validate validates the configuration.
-func (c *DeployConfig) validate() error {
+func (c *Config) validate() error {
 	if c.Address == "" {
 		return errors.New("address is required")
 	}
@@ -90,13 +90,13 @@ func (c *DeployConfig) validate() error {
 	return nil
 }
 
-func ReadConfig(path string) (*DeployConfig, error) {
+func ReadConfig(path string) (*Config, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var config DeployConfig
+	var config Config
 	if err := json.Unmarshal(file, &config); err != nil {
 		return nil, err
 	}
