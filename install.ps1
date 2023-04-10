@@ -6,7 +6,7 @@
 .PARAMETER DeployDir
     Specifies Deploy root path.
     If not specified, Deploy will be installed to '$env:USERPROFILE\deploy'.
-.PARAMETER BaseUrl
+.PARAMETER Proxy
     You can use proxies if you have network trouble in accessing GitHub,
     e.g. install.ps1 -BaseUrl 'https://ghproxy.com'
 .PARAMETER NoProxy
@@ -25,11 +25,10 @@
 param(
     [String] $DeployDir, # 安装目录
 #    [Switch] $NoProxy, # 不使用代理
-#     [Uri] $Proxy, # 代理地址
+     [Uri] $Proxy, # 代理地址
 #     [System.Management.Automation.PSCredential] $ProxyCredential, # 代理认证
 #     [Switch] $ProxyUseDefaultCredentials, # 代理使用默认认证
-    [Switch] $RunAsAdmin, # 是否以管理员身份运行
-    [Uri] $BaseUrl # 下载地址
+    [Switch] $RunAsAdmin # 是否以管理员身份运行
 )
 
 # Disable StrictMode in this script
@@ -247,9 +246,9 @@ function Install-Deploy
 
     $downloader = Get-Downloader
     $url = "$URL"
-    if ($BaseUrl)
+    if ($Proxy)
     {
-        $url = "$BaseUrl/$URL"
+        $url = "$Proxy/$URL"
     }
 
     $deployTarFile = "$DEPLOY_DIR\deploy-windows-amd64.tgz"
@@ -276,7 +275,7 @@ function Install-Deploy
     tar -xzf $deployTarFile -C $deployUnTarFileTmpDir | Out-Null
     if ($LastExitCode -ne 0)
     {
-        Write-InstallError "Failed to extract $deployTarFile to $deployUnTarFileTmpDir"
+        Deny-Install "Failed to extract $deployTarFile to $deployUnTarFileTmpDir"
         Remove-Item $deployTarFile -Force
         Remove-Item $deployUnTarFileTmpDir -Force -Recurse
         return
