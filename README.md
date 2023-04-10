@@ -3,6 +3,8 @@
 ### 手动下载
 
 #### Window
+
+##### PowerShell
 ```shell
 # 下载
 wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/deploy-windows-amd64.tgz
@@ -10,7 +12,7 @@ wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/de
 # 解压
 tar -xvzf deploy-windows-amd64.tgz -C /your/path
 # 设置环境变量
-setx DEPLOY /your/path
+$env:Path="$env:Path;/your/path"
 ```
 
 #### Linux
