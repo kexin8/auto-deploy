@@ -8,15 +8,15 @@
 # Optional: Needed to run a remote script the first time
 # 可选：第一次运行远程脚本时需要
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm install.ps1 | iex
+irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 | iex
 # if you can't access github, you can use proxy
 # 如果访问github很慢，可以使用代理
-irm install.ps1 -BaseUrl 'https://ghproxy.com' | iex
+irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -BaseUrl 'https://ghproxy.com' | iex
 ```
 
 #### Linux & Mac
 ```shell
-curl install.sh | sh
+curl https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh
 ```
 
 ### 手动下载
