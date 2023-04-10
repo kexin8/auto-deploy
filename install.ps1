@@ -6,9 +6,6 @@
 .PARAMETER DeployDir
     Specifies Deploy root path.
     If not specified, Deploy will be installed to '$env:USERPROFILE\deploy'.
-.PARAMETER Proxy
-    You can use proxies if you have network trouble in accessing GitHub,
-    e.g. install.ps1 -BaseUrl 'https://ghproxy.com'
 .PARAMETER NoProxy
     Bypass system proxy during the installation.
 .PARAMETER Proxy
@@ -24,10 +21,10 @@
 #>
 param(
     [String] $DeployDir, # 安装目录
-#    [Switch] $NoProxy, # 不使用代理
-     [Uri] $Proxy, # 代理地址
-#     [System.Management.Automation.PSCredential] $ProxyCredential, # 代理认证
-#     [Switch] $ProxyUseDefaultCredentials, # 代理使用默认认证
+    [Switch] $NoProxy, # 不使用代理
+    [Uri] $Proxy, # 代理地址
+    [System.Management.Automation.PSCredential] $ProxyCredential, # 代理认证
+    [Switch] $ProxyUseDefaultCredentials, # 代理使用默认认证
     [Switch] $RunAsAdmin # 是否以管理员身份运行
 )
 
@@ -79,13 +76,15 @@ function Deny-Install
 function Test-ValidateParameter
 {
 
-    #     if ($null -eq $Proxy -and ($null -ne $ProxyCredential -or $ProxyUseDefaultCredentials)) {
-    #         Deny-Install "Provide a valid proxy URI for the -Proxy parameter when using the -ProxyCredential or -ProxyUseDefaultCredentials."
-    #     }
-    #
-    #     if ($ProxyUseDefaultCredentials -and $null -ne $ProxyCredential) {
-    #         Deny-Install "ProxyUseDefaultCredentials is conflict with ProxyCredential. Don't use the -ProxyCredential and -ProxyUseDefaultCredentials together."
-    #     }
+    if ($null -eq $Proxy -and ($null -ne $ProxyCredential -or $ProxyUseDefaultCredentials))
+    {
+        Deny-Install "Provide a valid proxy URI for the -Proxy parameter when using the -ProxyCredential or -ProxyUseDefaultCredentials."
+    }
+
+    if ($ProxyUseDefaultCredentials -and $null -ne $ProxyCredential)
+    {
+        Deny-Install "ProxyUseDefaultCredentials is conflict with ProxyCredential. Don't use the -ProxyCredential and -ProxyUseDefaultCredentials together."
+    }
 }
 
 function Test-IsAdministrator
@@ -211,24 +210,31 @@ function Get-Downloader
     $downloadSession = New-Object System.Net.WebClient
 
     # Set proxy to null if NoProxy is specificed
-    #     if ($NoProxy) {
-    #         $downloadSession.Proxy = $null
-    #     } elseif ($Proxy) {
-    #         # Prepend protocol if not provided
-    #         if (!$Proxy.IsAbsoluteUri) {
-    #             $Proxy = New-Object System.Uri("http://" + $Proxy.OriginalString)
-    #         }
-    #
-    #         $Proxy = New-Object System.Net.WebProxy($Proxy)
-    #
-    #         if ($null -ne $ProxyCredential) {
-    #             $Proxy.Credentials = $ProxyCredential.GetNetworkCredential()
-    #         } elseif ($ProxyUseDefaultCredentials) {
-    #             $Proxy.UseDefaultCredentials = $true
-    #         }
-    #
-    #         $downloadSession.Proxy = $Proxy
-    #     }
+    if ($NoProxy)
+    {
+        $downloadSession.Proxy = $null
+    }
+    elseif ($Proxy)
+    {
+        # Prepend protocol if not provided
+        if (!$Proxy.IsAbsoluteUri)
+        {
+            $Proxy = New-Object System.Uri("http://" + $Proxy.OriginalString)
+        }
+
+        $Proxy = New-Object System.Net.WebProxy($Proxy)
+
+        if ($null -ne $ProxyCredential)
+        {
+            $Proxy.Credentials = $ProxyCredential.GetNetworkCredential()
+        }
+        elseif ($ProxyUseDefaultCredentials)
+        {
+            $Proxy.UseDefaultCredentials = $true
+        }
+
+        $downloadSession.Proxy = $Proxy
+    }
 
     return $downloadSession
 }
@@ -245,11 +251,6 @@ function Install-Deploy
     Write-Verbose "$BaseUrl"
 
     $downloader = Get-Downloader
-    $url = "$URL"
-    if ($Proxy)
-    {
-        $url = "$Proxy/$URL"
-    }
 
     $deployTarFile = "$DEPLOY_DIR\deploy-windows-amd64.tgz"
     # 创建目录
@@ -260,7 +261,7 @@ function Install-Deploy
 
     # 输出deployTarFile
     Write-InstallInfo "Downloading Deploy from $url to $deployTarFile ..."
-    $downloader.downloadFile($url, $deployTarFile)
+    $downloader.downloadFile($URL, $deployTarFile)
 
     Write-InstallInfo "Extracting ..."
 
