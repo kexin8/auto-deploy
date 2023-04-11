@@ -11,7 +11,10 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 | iex
 # if you can't access github, you can use proxy
 # 如果访问github很慢，可以使用镜像代理
-irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 | iex
+irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
+
+# 国内访问
+irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install_ZH-CN.ps1 | iex
 ```
 
 #### Linux & Mac
