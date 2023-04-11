@@ -1,0 +1,31 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    paths:
+      - 'install*.ps1'
+      - 'install*.sh'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: install
+        name: install
+        body: 用于保存下载安装脚本
+        draft: false
+        prerelease: false
+        token: ${{ github.token }}
+        files: |
+          install*.ps1
+          install*.sh
+    
