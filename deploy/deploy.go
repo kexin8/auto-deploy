@@ -7,8 +7,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
+	"strings"
 )
 
 // UploadFile uploads a file to the remote server
@@ -17,38 +17,66 @@ func (c *Config) UploadFile() (err error) {
 	//上传文件至远程服务器指定目录
 	//2.执行前置命令
 	fmt.Println("Pre command ...")
-	if err := execList(c.sshClient, c.PreCmd...); err != nil {
+	if err := execCommands(c.sshClient, c.PreCmd...); err != nil {
 		return err
 	}
 
 	//3.上传文件
 	fmt.Println("Upload file to remote ...")
-	filename := filepath.Base(c.SrcFile)
+
+	//创建目标目录
 	if err := sftpcli.MkdirAll(c.TargetDir); err != nil {
 		return err
 	}
-	targetfile, err := sftpcli.Create(path.Join(c.TargetDir, filename))
+
+	paths := strings.Split(c.SrcFile, ",")
+	for i, path := range paths {
+		err2 := c.upload(path, i, len(paths))
+		if err2 != nil {
+			return err2
+		}
+	}
+
+	//4.执行后置命令
+	fmt.Println("Post command ...")
+	if err := execCommands(c.sshClient, c.PostCmd...); err != nil {
+		return err
+	}
+
+	return
+}
+
+func (c *Config) upload(path string, number, total int) error {
+	//获取源文件信息
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	info, err := file.Stat()
 	if err != nil {
 		return err
 	}
 
-	srcfile, err := os.Open(c.SrcFile)
+	filename := filepath.Base(path)
+
+	//创建目标文件
+	targetFile, err := c.sftpClient.Create(filepath.Join(c.TargetDir, filename))
 	if err != nil {
 		return err
 	}
+	defer targetFile.Close()
 
-	srcfileinfo, err := srcfile.Stat()
-	if err != nil {
-		return err
-	}
-
-	bar := progressbar.NewOptions64(srcfileinfo.Size(),
+	//进度条
+	bar := progressbar.NewOptions64(info.Size(),
 		//progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
 		//progressbar.OptionSetWidth(25),
 		progressbar.OptionFullWidth(),
-		progressbar.OptionSetDescription("[cyan][1/1][reset] "+filename+" "),
+		//progressbar.OptionSetDescription("[cyan][1/1][reset] "+filename+" "),
+		progressbar.OptionSetDescription(fmt.Sprintf("[cyan][%d/%d][reset] %s ", number+1, total, filename)),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "[green]=[reset]",
 			SaucerHead:    "[green]>[reset]",
@@ -57,25 +85,18 @@ func (c *Config) UploadFile() (err error) {
 			BarEnd:        "]",
 		}))
 
-	_, err = targetfile.ReadFrom(io.TeeReader(srcfile, bar))
-	if err != nil {
+	//上传文件
+	if _, err := io.Copy(targetFile, io.TeeReader(file, bar)); err != nil {
 		return err
 	}
-
 	fmt.Println()
-	//4.执行后置命令
-	fmt.Println("Post command ...")
-	if err := execList(c.sshClient, c.PostCmd...); err != nil {
-		return err
-	}
-
-	return
+	return nil
 }
 
-func execList(client *ssh.Client, cmd ...string) error {
+func execCommands(client *ssh.Client, cmd ...string) error {
 	for _, command := range cmd {
 		//执行命令
-		if err := exec(client, command); err != nil {
+		if err := execCommand(client, command); err != nil {
 			// [command] command					FAILED
 			fmt.Printf("%s `%s`					%s\r\n",
 				color.YellowString("[command]"), command, color.RedString("FAILED"))
@@ -87,7 +108,7 @@ func execList(client *ssh.Client, cmd ...string) error {
 	return nil
 }
 
-func exec(client *ssh.Client, cmd string) error {
+func execCommand(client *ssh.Client, cmd string) error {
 	session, err := client.NewSession()
 	if err != nil {
 		return err

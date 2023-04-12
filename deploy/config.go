@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"os"
+	"strings"
 
 	lsftp "github.com/kexin8/auto-deploy/sftp"
 )
@@ -19,7 +20,7 @@ type Config struct {
 	PublicKeyPath string `json:"publicKeyPath,omitempty"` // PublicKeyPath
 	Timeout       int    `json:"timeout,omitempty"`       // Timeout in seconds,default 10s
 
-	//Path of the file to be uploaded
+	//Path of the file to be uploaded,multiple file use comma split e.g. "a.txt,b.txt"
 	SrcFile string `json:"srcFile"`
 
 	//deploy directory
@@ -78,13 +79,15 @@ func (c *Config) validate() error {
 		return errors.New("srcFile is required")
 	}
 
-	//src file is exist
-	if _, err := os.Stat(c.SrcFile); err != nil {
-		if os.IsNotExist(err) {
-			return errors.New(c.SrcFile + " is not exist")
+	//src files is exist
+	for _, path := range strings.Split(c.SrcFile, ",") {
+		_, err := os.Stat(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return fmt.Errorf("file %s is not exist", path)
+			}
+			return err
 		}
-
-		return err
 	}
 
 	if c.TargetDir == "" {
