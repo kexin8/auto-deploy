@@ -62,7 +62,7 @@ func (c *Config) upload(path string, number, total int) error {
 	filename := filepath.Base(path)
 
 	//创建目标文件
-	targetFile, err := c.sftpClient.Create(filepath.Join(c.TargetDir, filename))
+	targetFile, err := c.sftpClient.Create(c.TargetDir + "/" + filename)
 	if err != nil {
 		return err
 	}

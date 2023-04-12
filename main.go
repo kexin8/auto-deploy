@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -76,9 +77,11 @@ This is manually specifying the configuration file
 			}
 
 			if err == nil {
-				//filename DEPLOY					SUCCESS
-				green := color.New(color.FgGreen).SprintFunc()
-				fmt.Printf("%s DEPLOY					%s\r\n", filepath.Base(config.SrcFile), green("SUCCESS"))
+				for _, file := range strings.Split(config.SrcFile, ",") {
+					//filename DEPLOY					SUCCESS
+					green := color.New(color.FgGreen).SprintFunc()
+					fmt.Printf("%s DEPLOY					%s\r\n", filepath.Base(file), green("SUCCESS"))
+				}
 			}
 
 			fmt.Println("END.")
