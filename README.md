@@ -76,3 +76,110 @@ tar -zxvf deploy-darwin-amd64.tgz -C /your/path/
 # 设置环境变量
 export PATH=$PATH:/your/path
 ```
+
+
+
+## 用法
+
+```shell
+# 初始化配置
+deploy init [-a]
+# 修改配置文件
+vim dyconfig.json
+# 执行
+deploy
+```
+
+## 命令说明
+
+#### init
+
+> 初始化配置
+
+`deploy init`会再当前路径下创建一个名为`dyconfig.json`的配置文件
+
+```shell
+# init dyconfig.json
+> deploy init
+# Or select Display all configurations
+> deploy init -a
+```
+
+dyconfig.json
+
+```json
+{
+	"address": "localhost:22",
+	"username": "your_username",
+	"password": "your_password",
+	"publicKey": "your_pubkey",
+	"publicKeyPath": "your_pubkey_path",
+	"timeout": 10,
+	"srcFile": "your need to deploy file",
+	"targetDir": "remote target dir",
+	"preCmd": [
+		"Before uploading a file"
+	],
+	"postCmd": [
+		"After uploading the file"
+	]
+}
+```
+
+**配置说明**
+
+| 名称          | 必填 | 说明                                 | 样例         |
+| ------------- | ---- | ------------------------------------ | ------------ |
+| address       | Y    | 服务器地址<br />`<host>:<ip>`        | localhost:22 |
+| username      | Y    | 用户名                               |              |
+| password      | N    | 密码                                 |              |
+| publicKey     | N    | 公钥                                 |              |
+| publicKeyPath | N    | 公钥文件路径                         |              |
+| timeout       | N    | 超时时间，单位s，默认10s             |              |
+| srcFile       | Y    | 需要上传的文件路径，多个使用逗号分隔 |              |
+| targetDir     | Y    | 服务器目标路径                       |              |
+| preCmd        | N    | 上传文件前需要执行的命令             |              |
+| postCmd       | N    | 上传后需要执行的命令                 |              |
+
+#### version
+
+> 查看版本
+
+```shell
+> deploy version
+>
+deploy version v0.2.4 windows/amd64
+```
+
+
+
+#### help
+
+> 帮助
+
+```shell
+> deploy --help
+# or
+> deploy -h
+NAME:
+   deploy - this is a simple cli app that automates deploy
+
+USAGE:
+   deploy [\path\to\config.json]
+
+DESCRIPTION:
+   This is a simple cli app that automates deploy.
+   e.g. This is a common way to perform deploy, according to dyconfig.json in the current path
+     deploy
+   This is manually specifying the configuration file
+     deploy \path\to\config.json
+
+COMMANDS:
+   init
+   version, v  Show version
+   help, h     Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help
+```
+
