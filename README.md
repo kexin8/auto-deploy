@@ -1,3 +1,15 @@
+
+## 用法
+
+```shell
+# 初始化配置
+deploy init [-a]
+# 修改配置文件
+vim dyconfig.json
+# 执行
+deploy
+```
+
 ## 安装
 
 ### 脚本安装（推荐）
@@ -75,19 +87,6 @@ wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/de
 tar -zxvf deploy-darwin-amd64.tgz -C /your/path/
 # 设置环境变量
 export PATH=$PATH:/your/path
-```
-
-
-
-## 用法
-
-```shell
-# 初始化配置
-deploy init [-a]
-# 修改配置文件
-vim dyconfig.json
-# 执行
-deploy
 ```
 
 ## 命令说明
