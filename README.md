@@ -4,6 +4,8 @@
 
 #### Window
 
+##### PowerShell
+
 ```shell
 # Optional: Needed to run a remote script the first time
 # 可选：第一次运行远程脚本时需要
@@ -12,8 +14,12 @@ irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 
 # if you can't access github, you can use proxy
 # 如果访问github很慢，可以使用镜像代理
 irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
+```
 
-# 国内访问
+**国内访问**
+```shell
+# 可选：第一次运行远程脚本时需要
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install_ZH-CN.ps1 | iex
 ```
 
