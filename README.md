@@ -16,7 +16,7 @@ irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 
 irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
 ```
 
-**国内访问**
+*国内访问*
 ```shell
 # 可选：第一次运行远程脚本时需要
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
