@@ -37,7 +37,12 @@ jobs:
       run: go get .
     
     - name: Build
-      run: go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w" main.go
+      run: > # > is used to ignore the newline
+        version=$(git describe --tags --always) && 
+        go build -v -o release/deploy${{ matrix.goexe }} -ldflags "-s -w 
+        -X main.Version=${version} 
+        -X main.Os=${{ matrix.goos }} 
+        -X main.Arch=${{ matrix.goarch }}"
       env:
         CGO_ENABLED: 0
         GOOS: ${{ matrix.goos }}

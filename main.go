@@ -17,6 +17,12 @@ const (
 	defConfigName = "dyconfig.json"
 )
 
+var (
+	Version = "v0.0.0"
+	Os      = "windows"
+	Arch    = "amd64"
+)
+
 func main() {
 	app := &cli.App{
 		Name: "deploy",
@@ -157,6 +163,15 @@ The specified application directory has been initially configured
 						return err
 					}
 
+					return nil
+				},
+			},
+			{
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Show version",
+				Action: func(ctx *cli.Context) error {
+					fmt.Printf("deploy version %s %s/%s\r\n", Version, Os, Arch)
 					return nil
 				},
 			},
