@@ -13,7 +13,7 @@ if [ $os == "Darwin" ]; then
 elif [ $os == "Linux" ]; then
     os="linux"
 else
-    echo "不支持的系统"
+    echo "不支持的系统 $os"
     exit 1
 fi
 
@@ -21,10 +21,10 @@ fi
 arch=`uname -m`
 if [ $arch == "x86_64" ]; then
     arch="amd64"
-elif [ $arch == "aarch64" ]; then
+elif [ $arch == "arm64" ]; then
     arch="arm64"
 else
-    echo "不支持的系统架构"
+    echo "不支持的系统架构 $arch"
     exit 1
 fi
 
