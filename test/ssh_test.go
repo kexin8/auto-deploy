@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/kexin8/auto-deploy/deploy"
 	lsftp "github.com/kexin8/auto-deploy/sftp"
 	"github.com/pkg/sftp"
 	"github.com/schollz/progressbar/v3"
@@ -77,4 +78,50 @@ func TestSSh(t *testing.T) {
 	}
 
 	t.Log(string(output))
+}
+
+func TestPipeline(t *testing.T) {
+	c, err := deploy.ReadConfig("../dyconfig.json")
+	if err != nil {
+		t.Error(err)
+	}
+
+	sshConf := lsftp.SSHConfig{
+		Address:       c.Address,
+		Username:      c.Username,
+		Password:      c.Password,
+		PublicKey:     c.PublicKey,
+		PublicKeyPath: c.PublicKeyPath,
+		Timeout:       c.Timeout,
+	}
+	gossh, err := sshConf.NewSshClient()
+	if err != nil {
+		t.Error(err)
+	}
+
+	session, _ := gossh.NewSession()
+	defer session.Close()
+
+	// 执行管道命令
+	//session.Stdout = os.Stdout
+	//session.Stderr = os.Stderr
+	//session.Stdin = os.Stdin
+
+	//_, err = session.StdoutPipe()
+	//if err != nil {
+	//	t.Error(err)
+	//}
+
+	//err = session.Run("ls -l |grep deploy")
+	//if err != nil {
+	//	t.Error(err)
+	//}
+
+	output, err := session.CombinedOutput("ps -ef |grep tb_tools |grep -v grep |awk '{print $2}' |xargs kill -9")
+	if err != nil {
+		t.Error(err)
+	}
+
+	t.Log(string(output))
+
 }
