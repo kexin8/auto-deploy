@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/kexin8/auto-deploy/deploy"
 	"github.com/kexin8/auto-deploy/log"
 	"github.com/urfave/cli/v2"
@@ -11,7 +10,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 const (
@@ -34,22 +32,7 @@ This is manually specifying the configuration file
 	deploy \path\to\config.json`,
 		Usage:     "this is a simple cli app that automates deploy",
 		UsageText: `deploy [\path\to\config.json]`,
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:        "debug",
-				Aliases:     []string{"d"},
-				Usage:       "enable debug mode",
-				Hidden:      true,
-				Value:       false,
-				DefaultText: "false",
-			},
-		},
 		Action: func(ctx *cli.Context) error {
-
-			if ctx.Bool("debug") {
-				log.NewLogger(true)
-			}
-
 			profile := ctx.Args().First()
 			if profile == "" {
 				//检查当前目录是否存在配置文件 pdconfig.json
@@ -76,15 +59,7 @@ This is manually specifying the configuration file
 				return cli.Exit(fmt.Sprintf("upload file failed : %s", err), -1)
 			}
 
-			if err == nil {
-				for _, file := range strings.Split(config.SrcFile, ",") {
-					//filename DEPLOY					SUCCESS
-					green := color.New(color.FgGreen).SprintFunc()
-					fmt.Printf("%s DEPLOY					%s\r\n", filepath.Base(file), green("SUCCESS"))
-				}
-			}
-
-			fmt.Println("END.")
+			log.Info("END.")
 
 			return nil
 		},
@@ -126,12 +101,11 @@ The specified application directory has been initially configured
 					//fmt.Println("appath:" + appath)
 
 					config := deploy.Config{
-						Address:       "localhost:22",
-						Username:      "your_username",
-						Password:      "your_password",
-						PublicKeyPath: "your_pubkey_path",
-						SrcFile:       "your need to deploy file",
-						TargetDir:     "remote target dir",
+						Address:   "localhost:22",
+						Username:  "your_username",
+						Password:  "your_password",
+						SrcFile:   "your need to deploy file",
+						TargetDir: "remote target dir",
 					}
 
 					if isAllConfig {

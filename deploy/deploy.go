@@ -2,7 +2,7 @@ package deploy
 
 import (
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/kexin8/auto-deploy/log"
 	"github.com/schollz/progressbar/v3"
 	"golang.org/x/crypto/ssh"
 	"io"
@@ -16,13 +16,13 @@ func (c *Config) UploadFile() (err error) {
 	sftpcli := c.sftpClient
 	//上传文件至远程服务器指定目录
 	//2.执行前置命令
-	fmt.Println("Pre command ...")
+	log.Info("Pre command ...")
 	if err := execCommands(c.sshClient, c.PreCmd...); err != nil {
 		return err
 	}
 
 	//3.上传文件
-	fmt.Println("Upload file to remote ...")
+	log.Info("Upload file to remote ...")
 
 	//创建目标目录
 	if err := sftpcli.MkdirAll(c.TargetDir); err != nil {
@@ -31,14 +31,13 @@ func (c *Config) UploadFile() (err error) {
 
 	paths := strings.Split(c.SrcFile, ",")
 	for i, path := range paths {
-		err2 := c.upload(path, i, len(paths))
-		if err2 != nil {
-			return err2
+		if err := c.upload(path, i, len(paths)); err != nil {
+			return err
 		}
 	}
 
 	//4.执行后置命令
-	fmt.Println("Post command ...")
+	log.Info("Post command ...")
 	if err := execCommands(c.sshClient, c.PostCmd...); err != nil {
 		return err
 	}
@@ -73,8 +72,8 @@ func (c *Config) upload(path string, number, total int) error {
 		//progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
-		//progressbar.OptionSetWidth(25),
-		progressbar.OptionFullWidth(),
+		progressbar.OptionSetWidth(25),
+		//progressbar.OptionFullWidth(),
 		//progressbar.OptionSetDescription("[cyan][1/1][reset] "+filename+" "),
 		progressbar.OptionSetDescription(fmt.Sprintf("[cyan][%d/%d][reset] %s ", number+1, total, filename)),
 		progressbar.OptionSetTheme(progressbar.Theme{
@@ -95,15 +94,11 @@ func (c *Config) upload(path string, number, total int) error {
 
 func execCommands(client *ssh.Client, cmd ...string) error {
 	for _, command := range cmd {
+		log.InfoShell(command)
 		//执行命令
 		if err := execCommand(client, command); err != nil {
-			// [command] command					FAILED
-			fmt.Printf("%s `%s`					%s\r\n",
-				color.YellowString("[command]"), command, color.RedString("FAILED"))
 			return err
 		}
-		fmt.Printf("%s `%s`					%s\r\n",
-			color.YellowString("[command]"), command, color.GreenString("OK"))
 	}
 	return nil
 }
@@ -125,12 +120,12 @@ func execCommand(client *ssh.Client, cmd string) error {
 
 	output, err := session.CombinedOutput(cmd)
 	if err != nil {
-		fmt.Println(string(output))
+		log.Error(string(output))
 		return err
 	}
 
 	if len(output) > 0 {
-		fmt.Println(string(output))
+		log.Info(string(output))
 	}
 
 	return nil

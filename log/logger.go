@@ -2,34 +2,33 @@ package log
 
 import (
 	"fmt"
-	"log"
+	"github.com/fatih/color"
 )
 
-var (
-	logger Logger = NewLogger(true)
-)
-
-type Logger struct {
-	shortFlag bool //是否使用简写
-}
-
-func NewLogger(shortFlag bool) Logger {
-	return Logger{shortFlag: shortFlag}
-}
-
-func (l Logger) logger(format string, v ...any) {
-
-	if l.shortFlag {
-		fmt.Printf(format, v...)
-	} else {
-		log.Printf(format, v...)
-	}
+func InfoF(format string, args ...any) {
+	fmt.Println(fmt.Sprintf(format, args...))
 }
 
 func Info(msg string) {
-	logger.logger("%s\r\n", msg)
+	fmt.Println(msg)
 }
 
-func InfoF(format string, v ...any) {
-	logger.logger(format+"\r\n", v...)
+func SuccessF(format string, args ...any) {
+	fmt.Println(fmt.Sprintf("%s\t\t%s", fmt.Sprintf(format, args...), color.GreenString("✔")))
+}
+
+func Success(msg string) {
+	fmt.Println(fmt.Sprintf("%s\t\t%s", msg, color.GreenString("✔")))
+}
+
+func ErrorF(format string, args ...any) {
+	fmt.Println(color.RedString(format, args...))
+}
+
+func Error(msg string) {
+	fmt.Println(color.RedString(msg))
+}
+
+func InfoShell(cmd string) {
+	fmt.Printf("%s %s", color.YellowString(">"), cmd)
 }
