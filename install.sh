@@ -4,7 +4,8 @@
 VERSION=`curl -s https://api.github.com/repos/kexin8/auto-deploy/releases/latest | grep tag_name | cut -d '"' -f 4`
 URL="https://github.com/kexin8/auto-deploy/releases/download/$VERSION"
 
-DEPLOY_DIR="/usr/local/bin/deploy"
+# 获取当前用户的家目录
+DEPLOY_DIR="$HOME/Applications/deploy"
 
 # 获取当前系统
 os=`uname -s`
@@ -43,9 +44,10 @@ cp $tarFileTmpDir/* $DEPLOY_DIR
 rm -rf $tarFileTmpDir
 
 # 获取当前系统的环境变量Path，判断是否已经存在，不存在则添加
-path=`echo $PATH | grep "$DEPLOY_DIR"`
+path=`echo $PATH | grep $DEPLOY_DIR`
 if [ -z "$path" ]; then
     echo "export PATH=$DEPLOY_DIR:\$PATH" >> ~/.bash_profile
-    # shellcheck disable=SC1090
-    source ~/.bash_profile
+    # tips
+    echo "please run 'source ~/.bash_profile' to make deploy command available"
+    echo "or reopen your terminal"
 fi
