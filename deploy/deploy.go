@@ -110,14 +110,6 @@ func execCommand(client *ssh.Client, cmd string) error {
 	}
 	defer session.Close()
 
-	// 如何解决无法使用管道的问题
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-	session.Stdin = os.Stdin
-	if err := session.Run(cmd); err != nil {
-		return err
-	}
-
 	output, err := session.CombinedOutput(cmd)
 	if err != nil {
 		log.Error(string(output))

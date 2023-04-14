@@ -30,5 +30,5 @@ func Error(msg string) {
 }
 
 func InfoShell(cmd string) {
-	fmt.Printf("%s %s", color.YellowString(">"), cmd)
+	fmt.Printf("%s %s\r\n", color.YellowString(">"), cmd)
 }
