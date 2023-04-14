@@ -1,8 +1,21 @@
 #!/bin/bash
 
+# 判断命令是否执行成功
+function check() {
+    if [ $? -ne 0 ]; then
+        echo "$1"
+        exit 1
+    fi
+}
+
 # 获取版本号
 VERSION=`curl -s https://api.github.com/repos/kexin8/auto-deploy/releases/latest | grep tag_name | cut -d '"' -f 4`
 URL="https://github.com/kexin8/auto-deploy/releases/download/$VERSION"
+Proxy=$1
+
+if [ -n "$Proxy" ]; then
+    URL="http://$Proxy/$URL"
+fi
 
 # 获取当前用户的家目录
 DEPLOY_DIR="$HOME/Applications/deploy"
@@ -14,8 +27,7 @@ if [ $os == "Darwin" ]; then
 elif [ $os == "Linux" ]; then
     os="linux"
 else
-    echo "不支持的系统 $os"
-    exit 1
+    check "不支持的系统 $os"
 fi
 
 # 获取当前系统架构 amd64 or arm64
@@ -25,17 +37,18 @@ if [ $arch == "x86_64" ]; then
 elif [ $arch == "arm64" ]; then
     arch="arm64"
 else
-    echo "不支持的系统架构 $arch"
-    exit 1
+    check "不支持的系统架构 $arch"
 fi
 
 echo "download $URL/deploy-$os-$arch.tgz to $DEPLOY_DIR"
 
 tarFileTmpDir=$DEPLOY_DIR/tmp
 mkdir -p $tarFileTmpDir
+check "create tmp dir failed $tarFileTmpDir"
 
 # 解压至临时目录，避免覆盖
-curl $URL/deploy-$os-$arch.tgz | tar -zxvf - -C $tarFileTmpDir
+curl $URL/deploy-$os-$arch.tgz | tar -zxf - -C $tarFileTmpDir
+check "download deploy-$os-$arch.tgz failed"
 
 # 复制文件到目标目录
 cp $tarFileTmpDir/* $DEPLOY_DIR
