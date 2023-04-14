@@ -144,6 +144,14 @@ The specified application directory has been initially configured
 				},
 			},
 			{
+				Name:  "upgrade",
+				Usage: "upgrade deploy",
+				Action: func(ctx *cli.Context) error {
+
+					return nil
+				},
+			},
+			{
 				Name:    "version",
 				Aliases: []string{"v"},
 				Usage:   "Show version",
