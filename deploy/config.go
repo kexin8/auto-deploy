@@ -4,16 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/pkg/sftp"
-	"golang.org/x/crypto/ssh"
 	"os"
 	"strings"
-
-	lsftp "github.com/kexin8/auto-deploy/sftp"
 )
 
 type Config struct {
-	Address       string `json:"address"`                 // IP address or hostname
+	Address       string `json:"address"`                 // IP address or hostname,multiple address use comma split
 	Username      string `json:"username"`                // Username
 	Password      string `json:"password"`                // Password
 	PublicKey     string `json:"publicKey,omitempty"`     // PublicKey
@@ -23,7 +19,7 @@ type Config struct {
 	//Path of the file to be uploaded,multiple file use comma split e.g. "a.txt,b.txt"
 	SrcFile string `json:"srcFile"`
 
-	//deploy directory
+	//The path of the file to be uploaded after the command is executed
 	TargetDir string `json:"targetDir"`
 	//Command to be executed before uploading a file
 	//e.g. "rm -rf {dir}/*"
@@ -31,37 +27,12 @@ type Config struct {
 	//Command to be executed after uploading a file
 	//e.g. "unzip -o {dir}/{file} -d {dir}"
 	PostCmd []string `json:"postCmd,omitempty"`
-
-	sshClient  *ssh.Client
-	sftpClient *sftp.Client
 }
 
 func (c *Config) Init() error {
 	if err := c.validate(); err != nil {
 		return fmt.Errorf("invalid configuration: %w", err)
 	}
-
-	sshConf := lsftp.SSHConfig{
-		Address:       c.Address,
-		Username:      c.Username,
-		Password:      c.Password,
-		PublicKey:     c.PublicKey,
-		PublicKeyPath: c.PublicKeyPath,
-		Timeout:       c.Timeout,
-	}
-	sshClient, err := sshConf.NewSshClient()
-	if err != nil {
-		return err
-	}
-
-	sftpClient, err := lsftp.NewSftpClient(sshClient)
-	if err != nil {
-		return err
-	}
-
-	c.sshClient = sshClient
-	c.sftpClient = sftpClient
-
 	return nil
 }
 

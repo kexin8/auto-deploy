@@ -23,6 +23,11 @@ var (
 )
 
 func main() {
+
+	cli.VersionPrinter = func(ctx *cli.Context) {
+		fmt.Printf("deploy version %s %s/%s\r\n", ctx.App.Version, Os, Arch)
+	}
+
 	app := &cli.App{
 		Name: "deploy",
 		Description: `This is a simple cli app that automates deploy.
@@ -32,6 +37,7 @@ This is manually specifying the configuration file
 	deploy \path\to\config.json`,
 		Usage:     "this is a simple cli app that automates deploy",
 		UsageText: `deploy [\path\to\config.json]`,
+		Version:   Version,
 		Action: func(ctx *cli.Context) error {
 			profile := ctx.Args().First()
 			if profile == "" {
@@ -39,7 +45,7 @@ This is manually specifying the configuration file
 				_, err := os.Stat(defConfigName)
 				if err != nil {
 					if os.IsNotExist(err) {
-						return cli.Exit("dyconfig.json does not exist, please use 'deploy init' to initialize", -1)
+						return fmt.Errorf("dyconfig.json does not exist, please use 'deploy init' to initialize")
 					}
 					return err
 				}
@@ -49,18 +55,15 @@ This is manually specifying the configuration file
 			//读取配置文件
 			config, err := deploy.ReadConfig(profile)
 			if err != nil {
-				return cli.Exit(fmt.Sprintf("read config file %s failed : %s", profile, err), -1)
+				return err
 			}
 
 			if err := config.Init(); err != nil {
-				return cli.Exit(fmt.Sprintf("init failed : %s", err), -1)
+				return err
 			}
-			if err := config.UploadFile(); err != nil {
-				return cli.Exit(fmt.Sprintf("upload file failed : %s", err), -1)
+			if err := config.UploadFiles(); err != nil {
+				return err
 			}
-
-			log.Info("END.")
-
 			return nil
 		},
 		Commands: []*cli.Command{
@@ -151,20 +154,11 @@ The specified application directory has been initially configured
 					return nil
 				},
 			},
-			{
-				Name:    "version",
-				Aliases: []string{"v"},
-				Usage:   "Show version",
-				Action: func(ctx *cli.Context) error {
-					fmt.Printf("deploy version %s %s/%s\r\n", Version, Os, Arch)
-					return nil
-				},
-			},
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.Error(err.Error())
+		os.Exit(1)
 	}
 }
