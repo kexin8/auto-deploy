@@ -170,6 +170,7 @@ The specified application directory has been initially configured
 
 					if latestVersion == Version {
 						log.Info("deploy is already the latest version")
+						return nil
 					}
 
 					log.InfoF("latest  version: %s", latestVersion)
