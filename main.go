@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/kexin8/auto-deploy/deploy"
 	"github.com/kexin8/auto-deploy/log"
 	"github.com/urfave/cli/v2"
@@ -14,6 +15,7 @@ import (
 
 const (
 	defConfigName = "dyconfig.json"
+	url           = "https://github.com/kexin8/auto-deploy"
 )
 
 var (
@@ -39,6 +41,17 @@ This is manually specifying the configuration file
 		UsageText: `deploy [\path\to\config.json]`,
 		Version:   Version,
 		Action: func(ctx *cli.Context) error {
+
+			// 进行版本检查，如果有新版本则提示更新
+			latestVersion, err := deploy.GetLatestVersion()
+			if err != nil {
+				// 不影响正常使用
+				log.ErrorF("check latest version failed: %s", err)
+			}
+			if latestVersion != "" && latestVersion != Version {
+				log.Info(color.YellowString("latest version %s is available, please update to the latest version: %s", latestVersion, url))
+			}
+
 			profile := ctx.Args().First()
 			if profile == "" {
 				//检查当前目录是否存在配置文件 pdconfig.json
@@ -150,6 +163,18 @@ The specified application directory has been initially configured
 				Name:  "upgrade",
 				Usage: "upgrade deploy",
 				Action: func(ctx *cli.Context) error {
+					latestVersion, err := deploy.GetLatestVersion()
+					if err != nil {
+						return err
+					}
+
+					if latestVersion == Version {
+						log.Info("deploy is already the latest version")
+					}
+
+					log.InfoF("latest  version: %s", latestVersion)
+					log.InfoF("current version: %s", Version)
+					log.Info(color.YellowString("latest version %s is available, please update to the latest version: %s", latestVersion, url))
 
 					return nil
 				},
