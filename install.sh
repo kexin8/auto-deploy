@@ -8,6 +8,12 @@ function check() {
     fi
 }
 
+# 检测是否root用户
+if [ `whoami` == "root" ]; then
+    echo "please run this script as a normal user"
+    exit 1
+fi
+
 # 获取版本号
 VERSION=`curl -s https://api.github.com/repos/kexin8/auto-deploy/releases/latest | grep tag_name | cut -d '"' -f 4`
 URL="https://github.com/kexin8/auto-deploy/releases/download/$VERSION"
@@ -18,7 +24,8 @@ if [ -n "$Proxy" ]; then
 fi
 
 # 获取当前用户的家目录
-DEPLOY_DIR="$HOME/Applications/deploy"
+declare -A HOMES=(["Linux"]="/usr/bin" ["Darwin"]="$HOME/Applications")
+DEPLOY_DIR="${HOMES[`uname -s`]}/deploy"
 
 # 获取当前系统
 os=`uname -s`

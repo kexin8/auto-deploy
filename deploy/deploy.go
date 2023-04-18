@@ -132,8 +132,8 @@ func (c *Config) upload(p string, err error, gsftp *sftp.Client, i int, paths []
 		//progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
-		progressbar.OptionSetWidth(52),
-		//progressbar.OptionFullWidth(),
+		//progressbar.OptionSetWidth(),
+		progressbar.OptionFullWidth(),
 		//progressbar.OptionSetDescription("[cyan][1/1][reset] "+filename+" "),
 		progressbar.OptionSetDescription(fmt.Sprintf("[cyan][%d/%d][reset] %s ", i+1, len(paths), filename)),
 		progressbar.OptionSetTheme(progressbar.Theme{
