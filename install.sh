@@ -29,10 +29,10 @@ DEPLOY_DIR=""
 os=`uname -s`
 if [ $os == "Darwin" ]; then
     os="darwin"
-    DEPLOY_DIR="/usr/bin/deploy"
+    DEPLOY_DIR="$HOME/Applications/deploy"
 elif [ $os == "Linux" ]; then
     os="linux"
-    DEPLOY_DIR="$HOME/Applications/deploy"
+    DEPLOY_DIR="/usr/bin/deploy"
 else
     check "不支持的系统 $os"
 fi
