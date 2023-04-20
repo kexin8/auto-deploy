@@ -23,16 +23,16 @@ if [ -n "$Proxy" ]; then
     URL="http://$Proxy/$URL"
 fi
 
-# 获取当前用户的家目录
-declare -A HOMES=(["Linux"]="/usr/bin" ["Darwin"]="$HOME/Applications")
-DEPLOY_DIR="${HOMES[`uname -s`]}/deploy"
+DEPLOY_DIR=""
 
 # 获取当前系统
 os=`uname -s`
 if [ $os == "Darwin" ]; then
     os="darwin"
+    DEPLOY_DIR="/usr/bin/deploy"
 elif [ $os == "Linux" ]; then
     os="linux"
+    DEPLOY_DIR="$HOME/Applications/deploy"
 else
     check "不支持的系统 $os"
 fi
