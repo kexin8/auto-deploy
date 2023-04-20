@@ -20,7 +20,7 @@ URL="https://github.com/kexin8/auto-deploy/releases/download/$VERSION"
 Proxy=$1
 
 if [ -n "$Proxy" ]; then
-    URL="http://$Proxy/$URL"
+    URL="$Proxy/$URL"
 fi
 
 DEPLOY_DIR=""
