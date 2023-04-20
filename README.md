@@ -37,7 +37,12 @@ irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/
 
 #### Linux & Mac
 ```shell
-curl https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh
+curl -fsSL https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh
+```
+
+*国内访问*
+```shell
+curl -fsSL https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh https://ghproxy.com
 ```
 
 ### 手动下载
