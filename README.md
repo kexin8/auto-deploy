@@ -42,7 +42,7 @@ curl -fsSL https://github.com/kexin8/auto-deploy/releases/download/install/insta
 
 *国内访问*
 ```shell
-curl -fsSL https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh https://ghproxy.com
+curl -fsSL https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh -s https://ghproxy.com
 ```
 
 ### 手动下载
