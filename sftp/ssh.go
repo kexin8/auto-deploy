@@ -20,15 +20,17 @@ func (c SSHConfig) NewSshClient() (client *ssh.Client, err error) {
 
 	auth := make([]ssh.AuthMethod, 0)
 
-	auth = append(auth, ssh.Password(c.Password))
+	if c.Password != "" {
+		auth = append(auth, ssh.Password(c.Password))
+	}
 
-	signers := make([]ssh.Signer, 0)
 	if c.PublicKey != "" {
 		key, err := ssh.ParsePrivateKey([]byte(c.PublicKey))
 		if err != nil {
 			return nil, err
 		}
-		signers = append(signers, key)
+
+		auth = append(auth, ssh.PublicKeys(key))
 	}
 
 	if c.PublicKeyPath != "" {
@@ -41,11 +43,7 @@ func (c SSHConfig) NewSshClient() (client *ssh.Client, err error) {
 		if err != nil {
 			return nil, err
 		}
-		signers = append(signers, key)
-	}
-
-	if signers != nil && len(signers) > 0 {
-		auth = append(auth, ssh.PublicKeys(signers...))
+		auth = append(auth, ssh.PublicKeys(key))
 	}
 
 	client, err = ssh.Dial("tcp", c.Address, &ssh.ClientConfig{
@@ -54,5 +52,6 @@ func (c SSHConfig) NewSshClient() (client *ssh.Client, err error) {
 		Timeout:         time.Duration(c.Timeout) * time.Second,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	})
+
 	return
 }
