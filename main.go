@@ -43,14 +43,18 @@ This is manually specifying the configuration file
 		Action: func(ctx *cli.Context) error {
 
 			// 进行版本检查，如果有新版本则提示更新
-			latestVersion, err := deploy.GetLatestVersion()
-			if err != nil {
-				// 不影响正常使用
-				log.ErrorF("check latest version failed: %s", err)
-			}
-			if latestVersion != "" && latestVersion != Version {
-				log.Info(color.YellowString("latest version %s is available, please update to the latest version: %s", latestVersion, url))
-			}
+			//latestVersion, err := deploy.GetLatestVersion()
+			//if err != nil {
+			//	// 不影响正常使用
+			//	log.ErrorF("check latest version failed: %s", err)
+			//}
+
+			//if latestVersion != "" && latestVersion != Version {
+			//	log.Info(color.YellowString("latest version %s is available, please update to the latest version: %s", latestVersion, url))
+			//}
+
+			// 仅提醒用户访问网址，不影响正常使用
+			log.Info(color.YellowString("please visit %s for more information", url))
 
 			profile := ctx.Args().First()
 			if profile == "" {

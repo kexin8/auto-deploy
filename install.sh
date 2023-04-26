@@ -9,10 +9,10 @@ function check() {
 }
 
 # 检测是否root用户
-if [ `whoami` == "root" ]; then
-    echo "please run this script as a normal user"
-    exit 1
-fi
+#if [ `whoami` == "root" ]; then
+#    echo "please run this script as a normal user"
+#    exit 1
+#fi
 
 # 获取版本号
 VERSION=`curl -s https://api.github.com/repos/kexin8/auto-deploy/releases/latest | grep tag_name | cut -d '"' -f 4`
