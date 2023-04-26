@@ -5,10 +5,58 @@ import (
 	lsftp "github.com/kexin8/auto-deploy/sftp"
 	"github.com/pkg/sftp"
 	"github.com/schollz/progressbar/v3"
+	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
 	"testing"
 )
+
+const (
+	address   = ""
+	username  = ""
+	publicKey = ""
+)
+
+func TestPubKeyLogin(t *testing.T) {
+	//t.Log(os.Getenv("SSH_AUTH_SOCK"))
+
+	key, err := os.ReadFile(publicKey)
+	if err != nil {
+		t.Error(err)
+	}
+
+	signers, err := ssh.ParsePrivateKey(key)
+	if err != nil {
+		t.Error(err)
+	}
+
+	auths := []ssh.AuthMethod{ssh.PublicKeys(signers)}
+	config := &ssh.ClientConfig{
+		User:            username,
+		Auth:            auths,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	client, err := ssh.Dial("tcp", address, config)
+	if err != nil {
+		t.Error(err)
+	}
+	defer client.Close()
+
+	session, err := client.NewSession()
+	if err != nil {
+		t.Error(err)
+	}
+
+	defer session.Close()
+
+	output, err := session.Output("ls -l")
+	if err != nil {
+		t.Log(string(output))
+		t.Error(err)
+	}
+	t.Log(string(output))
+}
 
 func TestSftp(t *testing.T) {
 	config := lsftp.SSHConfig{
