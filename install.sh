@@ -1,18 +1,29 @@
 #!/bin/bash
+################################################################
+# @Author: kexin8
+# @Date: 2023-06-27
+# @Description: install auto-deploy tool
+################################################################
+
+function warn() {
+  echo -e "\033[33m$1\033[0m"
+}
+
+function info() {
+    echo $1
+}
+
+function error() {
+    echo -e "\033[31m$1\033[0m"
+}
 
 # 判断命令是否执行成功
 function check() {
     if [ $? -ne 0 ]; then
-        echo "$1"
+        error $1
         exit 1
     fi
 }
-
-# 检测是否root用户
-#if [ `whoami` == "root" ]; then
-#    echo "please run this script as a normal user"
-#    exit 1
-#fi
 
 # 获取版本号
 VERSION=`curl -s https://api.github.com/repos/kexin8/auto-deploy/releases/latest | grep tag_name | cut -d '"' -f 4`
@@ -47,7 +58,7 @@ else
     check "不支持的系统架构 $arch"
 fi
 
-echo "download $URL/deploy-$os-$arch.tgz to $DEPLOY_DIR"
+info "download $URL/deploy-$os-$arch.tgz to $DEPLOY_DIR"
 
 tarFileTmpDir=$DEPLOY_DIR/tmp
 mkdir -p $tarFileTmpDir
@@ -66,8 +77,8 @@ rm -rf $tarFileTmpDir
 # 获取当前系统的环境变量Path，判断是否已经存在，不存在则添加
 path=`echo $PATH | grep $DEPLOY_DIR`
 if [ -z "$path" ]; then
-    echo "export PATH=$DEPLOY_DIR:\$PATH" >> ~/.bash_profile
+    info "export PATH=$DEPLOY_DIR:$PATH" >> ~/.bash_profile
     # tips
-    echo "please run 'source ~/.bash_profile' to make deploy command available"
-    echo "or reopen your terminal"
+    warn "please run 'source ~/.bash_profile'"
+    warn "if you are using zsh, please run 'echo export PATH=$DEPLOY_DIR:'\$PATH' >> ~/.zshrc && source ~/.zshrc'"
 fi
