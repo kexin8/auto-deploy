@@ -3,6 +3,7 @@ package sftp
 import (
 	"errors"
 	"golang.org/x/crypto/ssh"
+	"os"
 	"time"
 )
 
@@ -44,7 +45,19 @@ func NewClient(c *Config) (client *ssh.Client, err error) {
 		auth = append(auth, ssh.Password(c.Pass))
 	}
 	if c.PubKey != "" {
-		key, err := ssh.ParsePrivateKey([]byte(c.PubKey))
+		var publicKey []byte
+		if _, err := os.Stat(c.PubKey); err == nil {
+			// is a public key file
+			publicKey, err = os.ReadFile(c.PubKey)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			// is a public key string
+			publicKey = []byte(c.PubKey)
+		}
+
+		key, err := ssh.ParsePrivateKey(publicKey)
 		if err != nil {
 			return nil, err
 		}

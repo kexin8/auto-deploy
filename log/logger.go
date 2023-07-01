@@ -21,6 +21,14 @@ func Success(msg string) {
 	fmt.Println(fmt.Sprintf("%s\t\t%s", msg, color.GreenString("✔")))
 }
 
+func WarnF(format string, args ...any) {
+	fmt.Println(color.YellowString(format, args...))
+}
+
+func Warn(msg string) {
+	fmt.Println(color.YellowString(msg))
+}
+
 func ErrorF(format string, args ...any) {
 	fmt.Println(color.RedString(format, args...))
 }

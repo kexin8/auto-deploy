@@ -54,7 +54,7 @@ This is manually specifying the configuration file
 			//}
 
 			// 仅提醒用户访问网址，不影响正常使用
-			log.Info(color.YellowString("please visit %s for more information", url))
+			log.Info(color.BlueString("please visit %s for the latest version", url))
 
 			profile := ctx.Args().First()
 			if profile == "" {

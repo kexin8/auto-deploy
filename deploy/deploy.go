@@ -28,7 +28,7 @@ func Init(c *Config, addr string) (sshClient *ssh.Client, sftpClient *sftp.Clien
 		Addr:    addr,
 		User:    c.User,
 		Pass:    c.Pass,
-		PubKey:  c.PubKey,
+		PubKey:  c.PublicKey,
 		Timeout: time.Duration(c.Timeout) * time.Second,
 	}
 	// 初始化sshClient和sftpClient
@@ -80,13 +80,13 @@ func deploy(c *Config, addr string) (err error) {
 
 	// pre commands
 	log.InfoF(sortLine, "Pre command")
-	if err := runCommands(sshClient, c.PreCmds, c.WorkDir, c.ChangeWorkDir); err != nil {
+	if err := runCommands(sshClient, c.PreCmd, c.WorkDir, c.ChangeWorkDir); err != nil {
 		return err
 	}
 
 	// upload files
 	log.InfoF(sortLine, "Upload file to remote")
-	srcFilePaths := strings.Split(c.SrcFiles, ",")
+	srcFilePaths := strings.Split(c.SrcFile, ",")
 	for i, fp := range srcFilePaths {
 		if err := upload(sftpClient, fp, c.WorkDir, i, len(srcFilePaths)); err != nil {
 			return err
@@ -95,7 +95,7 @@ func deploy(c *Config, addr string) (err error) {
 
 	// post commands
 	log.InfoF(sortLine, "Post command")
-	if err := runCommands(sshClient, c.PostCmds, c.WorkDir, c.ChangeWorkDir); err != nil {
+	if err := runCommands(sshClient, c.PostCmd, c.WorkDir, c.ChangeWorkDir); err != nil {
 		return err
 	}
 	return
