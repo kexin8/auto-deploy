@@ -70,15 +70,11 @@ This is manually specifying the configuration file
 			}
 
 			//读取配置文件
-			config, err := deploy.ReadConfig(profile)
+			config, err := deploy.NewConfig(profile)
 			if err != nil {
 				return err
 			}
-
-			if err := config.Init(); err != nil {
-				return err
-			}
-			if err := config.UploadFiles(); err != nil {
+			if err := deploy.Deploy(config); err != nil {
 				return err
 			}
 			return nil
@@ -120,27 +116,11 @@ The specified application directory has been initially configured
 
 					//fmt.Println("appath:" + appath)
 
-					config := deploy.Config{
-						Address:   "localhost:22",
-						Username:  "your_username",
-						Password:  "your_password",
-						SrcFile:   "your need to deploy file",
-						TargetDir: "remote target dir",
-					}
-
+					var config *deploy.Config
 					if isAllConfig {
-						config = deploy.Config{
-							Address:       "localhost:22",
-							Username:      "your_username",
-							Password:      "your_password",
-							PublicKey:     "your_pubkey",
-							PublicKeyPath: "your_pubkey_path",
-							Timeout:       10,
-							SrcFile:       "your need to deploy file",
-							TargetDir:     "remote target dir",
-							PreCmd:        []string{"Before uploading a file"},
-							PostCmd:       []string{"After uploading the file"},
-						}
+						config = deploy.ExampleAllConfig()
+					} else {
+						config = deploy.ExampleConfig()
 					}
 
 					//写入配置文件

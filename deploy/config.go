@@ -3,86 +3,105 @@ package deploy
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 )
 
 type Config struct {
-	Address       string `json:"address"`                 // IP address or hostname,multiple address use comma split
-	Username      string `json:"username"`                // Username
-	Password      string `json:"password"`                // Password
-	PublicKey     string `json:"publicKey,omitempty"`     // PublicKey
-	PublicKeyPath string `json:"publicKeyPath,omitempty"` // PublicKeyPath
-	Timeout       int    `json:"timeout,omitempty"`       // Timeout in seconds,default 10s
-
-	//Path of the file to be uploaded,multiple file use comma split e.g. "a.txt,b.txt"
-	SrcFile string `json:"srcFile"`
-
-	//The path of the file to be uploaded after the command is executed
-	TargetDir string `json:"targetDir"`
-	//Command to be executed before uploading a file
-	//e.g. "rm -rf {dir}/*"
-	PreCmd []string `json:"preCmd,omitempty"`
-	//Command to be executed after uploading a file
-	//e.g. "unzip -o {dir}/{file} -d {dir}"
-	PostCmd []string `json:"postCmd,omitempty"`
+	Addr     string `json:"addr"`              // IP address or hostname, e.g. "127.0.0.1:22,127.0.0.2:22,..."
+	User     string `json:"username"`          // Username
+	Pass     string `json:"password"`          // Password
+	PubKey   string `json:"pubKey,omitempty"`  // PublicKey
+	Timeout  int    `json:"timeout,omitempty"` // Timeout, default: 5s
+	SrcFiles string `json:"srcFiles"`          // Local files to be uploaded
+	WorkDir  string `json:"workDir"`           // Remote working directory
+	// ChangeWorkDir 命令执行之前是否将shell工作目录切换到工作目录下
+	// Default: true
+	ChangeWorkDir bool `json:"changeWorkDir,omitempty"`
+	// PreCmds A command to run before src files is upload
+	PreCmds []string `json:"preCmds"`
+	// PostCmds A command to run after src files is upload
+	PostCmds []string `json:"postCmds"`
 }
 
-func (c *Config) Init() error {
-	if err := c.validate(); err != nil {
-		return fmt.Errorf("invalid configuration: %w", err)
+// NewConfig returns a new Config
+func NewConfig(p string) (*Config, error) {
+	file, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	c := Config{
+		ChangeWorkDir: true, // Default: true
+		Timeout:       5,    // Default: 5s
+	}
+	if err := json.Unmarshal(file, &c); err != nil {
+		return nil, err
+	}
+
+	// Validate the Config
+	if err := c.Validate(); err != nil {
+		return nil, err
+	}
+	return &c, nil
 }
 
-// validate validates the configuration.
-func (c *Config) validate() error {
-	if c.Address == "" {
-		return errors.New("address is required")
+// Validate validates the Config
+func (c *Config) Validate() error {
+	if c.Addr == "" {
+		return errors.New("address can't be empty")
+	}
+	if c.User == "" {
+		return errors.New("username can't be empty")
+	}
+	if c.Pass == "" && c.PubKey == "" {
+		return errors.New("password and publicKey can't be empty at the same time")
+	}
+	if c.SrcFiles == "" {
+		return errors.New("srcFiles can't be empty")
+	}
+	if c.WorkDir == "" {
+		return errors.New("workDir can't be empty")
 	}
 
-	if c.Username == "" {
-		return errors.New("username is required")
-	}
-
-	if c.SrcFile == "" {
-		return errors.New("srcFile is required")
-	}
-
-	//src files is exist
-	for _, path := range strings.Split(c.SrcFile, ",") {
-		_, err := os.Stat(path)
-		if err != nil {
+	// check if the srcFiles exists
+	for _, filepath := range strings.Split(c.SrcFiles, ",") {
+		if _, err := os.Stat(filepath); err != nil {
 			if os.IsNotExist(err) {
-				return fmt.Errorf("file %s is not exist", path)
+				return errors.New(filepath + " not exists")
 			}
 			return err
 		}
 	}
 
-	if c.TargetDir == "" {
-		return errors.New("targetDir is required")
-	}
-
 	return nil
 }
 
-func ReadConfig(path string) (*Config, error) {
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
+// ExampleConfig Config
+func ExampleConfig() *Config {
+	return &Config{
+		Addr:     "host1:port1,host2:port2,...",
+		User:     "username",
+		Pass:     "password",
+		SrcFiles: "file1,file2,...",
+		WorkDir:  "/path/to/remote/dir",
+		PreCmds:  []string{"cmd1", "cmd2", "..."},
+		PostCmds: []string{"cmd1", "cmd2", "..."},
 	}
+}
 
-	var config Config
-	if err := json.Unmarshal(file, &config); err != nil {
-		return nil, err
+// ExampleAllConfig Config
+func ExampleAllConfig() *Config {
+	return &Config{
+		Addr:          "host1:port1,host2:port2,...",
+		User:          "username",
+		Pass:          "password",
+		PubKey:        "ssh public key",
+		Timeout:       5,
+		SrcFiles:      "file1,file2,...",
+		WorkDir:       "/path/to/remote/dir",
+		ChangeWorkDir: true,
+		PreCmds:       []string{"cmd1", "cmd2", "..."},
+		PostCmds:      []string{"cmd1", "cmd2", "..."},
 	}
-
-	// default timeout is 10 seconds
-	if config.Timeout == 0 {
-		config.Timeout = 10
-	}
-
-	return &config, nil
 }

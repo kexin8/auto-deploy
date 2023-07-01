@@ -1,13 +1,15 @@
 package deploy
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/kexin8/auto-deploy/log"
-	lsftp "github.com/kexin8/auto-deploy/sftp"
+	gssh "github.com/kexin8/auto-deploy/ssh"
 	"github.com/pkg/sftp"
 	"github.com/schollz/progressbar/v3"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/term"
 	"io"
 	"os"
 	"path/filepath"
@@ -21,35 +23,99 @@ const (
 	sortLine = "--- %s ---"
 )
 
-// UploadFiles uploads files to the remote server
-func (c *Config) UploadFiles() (err error) {
-	// 记录每个address操作消耗的时间
+func Init(c *Config, addr string) (sshClient *ssh.Client, sftpClient *sftp.Client, err error) {
+	config := &gssh.Config{
+		Addr:    addr,
+		User:    c.User,
+		Pass:    c.Pass,
+		PubKey:  c.PubKey,
+		Timeout: time.Duration(c.Timeout) * time.Second,
+	}
+	// 初始化sshClient和sftpClient
+	sshClient, err = gssh.NewClient(config)
+	if err != nil {
+		return
+	}
+
+	sftpClient, err = sftp.NewClient(sshClient)
+
+	return
+}
+
+// Deploy the specified files to the remote server
+func Deploy(c *Config) (err error) {
+	// 记录每个服务器发布&&部署消耗的时间
 	var (
-		exectimes = make(map[string]time.Duration)
-		sumtime   time.Duration
+		deploytimes = make(map[string]time.Duration) // {"addr": time}
+		sumtime     time.Duration
 	)
-	for _, address := range strings.Split(c.Address, ",") {
-		start := time.Now()
-		if err := c.UploadFile(address); err != nil {
+
+	for _, addr := range strings.Split(c.Addr, ",") {
+		startime := time.Now() // 记录开始时间
+
+		if err := deploy(c, addr); err != nil {
 			return err
 		}
-		exectimes[address] = time.Since(start)
-		sumtime += exectimes[address]
+
+		deploytimes[addr] = time.Since(startime)
+		sumtime += deploytimes[addr]
 	}
-	// Summary of the deployment
+
+	// 打印汇总信息
+	printSummary(deploytimes, sumtime)
+	return
+}
+
+func deploy(c *Config, addr string) (err error) {
+	log.InfoF(longLine, addr)
+	log.InfoF("Deploying to %s ...", addr)
+	sshClient, sftpClient, err := Init(c, addr)
+	if err != nil {
+		return err
+	}
+	defer sshClient.Close()
+	defer sftpClient.Close()
+
+	log.SuccessF("Connected to %s", addr)
+
+	// pre commands
+	log.InfoF(sortLine, "Pre command")
+	if err := runCommands(sshClient, c.PreCmds, c.WorkDir, c.ChangeWorkDir); err != nil {
+		return err
+	}
+
+	// upload files
+	log.InfoF(sortLine, "Upload file to remote")
+	srcFilePaths := strings.Split(c.SrcFiles, ",")
+	for i, fp := range srcFilePaths {
+		if err := upload(sftpClient, fp, c.WorkDir, i, len(srcFilePaths)); err != nil {
+			return err
+		}
+	}
+
+	// post commands
+	log.InfoF(sortLine, "Post command")
+	if err := runCommands(sshClient, c.PostCmds, c.WorkDir, c.ChangeWorkDir); err != nil {
+		return err
+	}
+	return
+}
+
+// printSummary prints the summary of the deployment
+func printSummary(deploytimes map[string]time.Duration, sumtime time.Duration) {
 	log.Info(line)
 	log.Info("Summary:")
 	log.Info("")
 
-	for _, address := range strings.Split(c.Address, ",") {
+	for addr, deploytime := range deploytimes {
 		//总长度固定52
 		//计算需要补充的.的个数
-		dotNum := 52 - len(address)
+		dotNum := 52 - len(addr)
 		dotStr := ""
 		for i := 0; i < dotNum; i++ {
 			dotStr += "."
 		}
-		log.InfoF("%s %s %s [  %f s]", address, dotStr, color.GreenString("SUCCESS"), exectimes[address].Seconds())
+		log.InfoF("%s %s %s [  %f s]", addr, dotStr, color.GreenString("SUCCESS"), deploytime.Seconds())
 	}
 	log.Info(line)
 	log.Info(color.GreenString("DEPLOY SUCCESS"))
@@ -57,85 +123,85 @@ func (c *Config) UploadFiles() (err error) {
 	log.InfoF("Total time: %f s", sumtime.Seconds())
 	log.InfoF("Finished at: %s", time.Now().Format("2006-01-02 15:04:05"))
 	log.Info(line)
+}
+
+// runCommands runs the commands on the remote server
+func runCommands(client *ssh.Client, commands []string, workDir string, changeWorkDir bool) (err error) {
+
+	if commands == nil || len(commands) == 0 {
+		return
+	}
+
+	session, err := gssh.NewSession(client)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+
+	_ = gssh.Run("mkdir -p " + workDir)
+
+	if changeWorkDir {
+		_ = gssh.Run("cd " + workDir)
+	}
+
+	var output string
+	for _, cmd := range commands {
+		log.InfoShell(cmd)
+		output, _ = gssh.CommandOutput(cmd)
+		log.Info(output)
+	}
+
+	_ = gssh.Run("exit")
+
+	if err := session.Wait(); err != nil {
+		return errors.New(output)
+	}
 	return
 }
 
-func (c *Config) UploadFile(address string) error {
-	log.InfoF(longLine, address)
-	log.InfoF("Deploying to %s ...", address)
-	//log.InfoF(longLine, address)
-	// 创建远程服务器连接，包含ssh和sftp
-	gssh, gsftp, err := c.newRemoteClient(address)
-	if err != nil {
-		return err
-	}
-	defer gssh.Close()
-	defer gsftp.Close()
+// upload uploads the specified file to the remote server
+func upload(sftpClient *sftp.Client, srcfile, targetDir string, i, total int) (err error) {
 
-	log.SuccessF("Connected to %s", address)
-
-	// 前置命令
-	log.InfoF(sortLine, "Pre command")
-	if err := execCommands(gssh, c.PreCmd...); err != nil {
-		return err
-	}
-
-	// 上传文件
-	log.InfoF(sortLine, "Upload file to remote")
-	paths := strings.Split(c.SrcFile, ",")
-	for i, p := range paths {
-		if err := c.upload(p, err, gsftp, i, paths); err != nil {
-			return err
-		}
-	}
-
-	// 后置命令
-	log.InfoF(sortLine, "Post command")
-	if err := execCommands(gssh, c.PostCmd...); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Config) upload(p string, err error, gsftp *sftp.Client, i int, paths []string) error {
 	var (
-		srcFile     *os.File
-		srcFileInfo os.FileInfo
+		file     *os.File
+		fileinfo os.FileInfo
 
-		filename = filepath.Base(p)
+		filename = filepath.Base(srcfile)
 		filesize int64
 	)
 
-	if srcFileInfo, err = os.Stat(p); err != nil {
+	if file, err = os.Open(srcfile); err != nil {
 		return err
 	}
-	filesize = srcFileInfo.Size()
+	defer file.Close()
 
-	if srcFile, err = os.Open(p); err != nil {
+	if fileinfo, err = file.Stat(); err != nil {
 		return err
 	}
-	defer srcFile.Close()
+	filesize = fileinfo.Size()
 
-	// 创建目标目录
-	if err := gsftp.MkdirAll(c.TargetDir); err != nil {
-		return err
-	}
 	// 创建目标文件
-	targetFile, err := gsftp.Create(c.TargetDir + "/" + filename)
+	targetfile, err := sftpClient.Create(targetDir + "/" + filename)
 	if err != nil {
 		return err
 	}
-	defer targetFile.Close()
+	defer targetfile.Close()
 
 	//进度条
+	width, err := getTermWidth()
+	if err != nil {
+		width = 80
+	}
+
+	width = int(float64(width) * 0.6)
 	bar := progressbar.NewOptions64(filesize,
 		//progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionShowBytes(true),
-		//progressbar.OptionSetWidth(),
-		progressbar.OptionFullWidth(),
+		progressbar.OptionSetWidth(width),
+		//progressbar.OptionFullWidth(),
 		//progressbar.OptionSetDescription("[cyan][1/1][reset] "+filename+" "),
-		progressbar.OptionSetDescription(fmt.Sprintf("[cyan][%d/%d][reset] %s ", i+1, len(paths), filename)),
+		progressbar.OptionSetDescription(fmt.Sprintf("[cyan][%d/%d][reset] %s ", i+1, total, filename)),
 		progressbar.OptionSetTheme(progressbar.Theme{
 			Saucer:        "[green]=[reset]",
 			SaucerHead:    "[green]>[reset]",
@@ -145,65 +211,15 @@ func (c *Config) upload(p string, err error, gsftp *sftp.Client, i int, paths []
 		}))
 
 	//上传文件
-	if _, err := io.Copy(targetFile, io.TeeReader(srcFile, bar)); err != nil {
+	if _, err := io.Copy(targetfile, io.TeeReader(file, bar)); err != nil {
 		return err
 	}
 	fmt.Println()
-	return nil
+
+	return
 }
 
-func (c *Config) newRemoteClient(address string) (*ssh.Client, *sftp.Client, error) {
-	//创建ssh客户端
-	sshConfig := lsftp.SSHConfig{
-		Address:       address,
-		Username:      c.Username,
-		Password:      c.Password,
-		PublicKey:     c.PublicKey,
-		PublicKeyPath: c.PublicKeyPath,
-		Timeout:       c.Timeout,
-	}
-
-	gssh, err := sshConfig.NewSshClient()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	//创建sftp客户端
-	gsftp, err := sftp.NewClient(gssh)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return gssh, gsftp, nil
-}
-
-func execCommands(client *ssh.Client, cmd ...string) error {
-	for _, command := range cmd {
-		log.InfoShell(command)
-		//执行命令
-		if err := execCommand(client, command); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func execCommand(client *ssh.Client, cmd string) error {
-	session, err := client.NewSession()
-	if err != nil {
-		return err
-	}
-	defer session.Close()
-
-	output, err := session.CombinedOutput(cmd)
-	if err != nil {
-		log.Error(string(output))
-		return err
-	}
-
-	if len(output) > 0 {
-		log.Info(string(output))
-	}
-
-	return nil
+func getTermWidth() (int, error) {
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	return width, err
 }
