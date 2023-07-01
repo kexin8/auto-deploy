@@ -54,21 +54,6 @@ jobs:
     
     - name: Package
       run: cd release && tar -cvzf deploy-${{ matrix.goos }}-${{ matrix.goarch }}.tgz deploy* ../README.md
-
-    - name: changelog
-      uses: github-changelog-generator/action@v1.1.0
-      with:
-        token: ${{ github.token }}
-        repo: ${{ github.repository }}
-        future-release: ${{ github.ref }}
-        exclude-labels: 'duplicate,question,invalid,wontfix,enhancement,help wanted'
-        exclude-tags: 'v*'
-        exclude-issues-with: 'wontfix,invalid,duplicate'
-        breaking-labels: 'breaking'
-        breaking-labels-exclude-title: 'no-changelog'
-        breaking-labels-exclude-labels: 'duplicate,question,invalid,wontfix,enhancement,help wanted'
-        breaking-labels-exclude-issues-with: 'wontfix,invalid,duplicate'
-        breaking-labels-exclude-tags: 'v*'
     
     - name: Deploy
       uses: softprops/action-gh-release@v1
@@ -76,7 +61,9 @@ jobs:
       with:
 #         tag_name: ${{ github.ref }}
 #         name: Release ${{ github.ref }}
-        body: ${{ steps.changelog.outputs.changelog }}
+        body: |
+          Release ${{ github.ref }}
+          ${{ github.event.release.body }}
         draft: false
         prerelease: false
         token: ${{ github.token }}
