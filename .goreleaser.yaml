@@ -1,7 +1,6 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
 project_name: deploy
-dist: release
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -10,11 +9,7 @@ before:
 #    - go generate ./...
 builds:
   - id: deploy
-#    binary: ../{{.Os}}_{{.Arch}}/deploy
-    binary: >-
-      ../
-      {{- if eq .Os "windows" }}win32
-      {{- else }}{{ .Os }}{{ end }}_{{ .Arch }}/deploy
+    binary: ../{{.Os}}_{{.Arch}}/deploy
     ldflags:
       - "-s -w"
       - "-X main.Version={{.Tag}}"
@@ -33,11 +28,7 @@ builds:
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
-    name_template: >-
-      {{ .ProjectName }}_{{ .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
+    name_template: {{ .ProjectName }}_{{ .Os }}_{{ .Arch }}
     # use zip for windows archives
     format_overrides:
     - goos: windows
