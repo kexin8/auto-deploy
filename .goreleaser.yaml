@@ -1,18 +1,25 @@
 # This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
+project_name: deploy
+dist: release
 before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
     # you may remove this if you don't need go generate
-    - go generate ./...
+#    - go generate ./...
 builds:
   - id: deploy
-    flags:
+#    binary: ../{{.Os}}_{{.Arch}}/deploy
+    binary: >-
+      ../
+      {{- if eq .Os "windows" }}win32
+      {{- else }}{{ .Os }}{{ end }}_{{ .Arch }}/deploy
+    ldflags:
       - "-s -w"
-      - "-X main.Version={{.Env.VERSION}}"
-      - "-X main.Os={{.Env.OS}}"
-      - "-X main.Arch=${{.Env.ARCH}}"
+      - "-X main.Version={{.Tag}}"
+      - "-X main.Os={{.Os}}"
+      - "-X main.Arch={{.Arch}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -21,23 +28,28 @@ builds:
       - darwin
     goarch:
       - amd64
-      - arm
       - arm64
 
 archives:
   - format: tar.gz
     # this name template makes the OS and Arch compatible with the results of uname.
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
+      {{- .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
     # use zip for windows archives
     format_overrides:
     - goos: windows
       format: zip
+    files:
+#      - LICENSE.txt
+      - README.md
+#      - CHANGELOG.md
+    # 将二进制文件放在一个目录中
+    wrap_in_directory: true
+    # 将从二进制文件中剥离父目录。
+    strip_parent_binary_folder: true
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -48,6 +60,8 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+      - '^ci'
+      - '^build'
 
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
