@@ -15,7 +15,8 @@
   },
   "files": [
     "index.js",
-    "package.json"
+    "package.json",
+    "yarn.lock"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
