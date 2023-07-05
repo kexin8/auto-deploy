@@ -38,7 +38,7 @@
 yarn global add @kexin88/deploy-cli
 ```
 
-### ~~NPM(Deprecated)~~
+### ~~Npm(Deprecated)~~
 
 > Deprecated: `npm uninstall -g` does not trigger the `preuninstall` event and therefore cannot delete the global binary file.
 
@@ -50,7 +50,7 @@ yarn global add @kexin88/deploy-cli
 curl -fsSL https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh
 ```
 
-**China mainland users can use the following command to speed up the download**
+*China mainland users can use the following command to speed up the download*
 
 ```shell
 curl -fsSL https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh -s https://ghproxy.com
@@ -66,7 +66,7 @@ irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 
 irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
 ```
 
-**China mainland users can use the following command to speed up the download**
+*China mainland users can use the following command to speed up the download*
 
 ```powershell
 # Optional: Needed to run a remote script the first time
