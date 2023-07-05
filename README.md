@@ -38,7 +38,7 @@
 yarn global add @kexin88/deploy-cli
 ```
 
-### NPM(Deprecated)
+### ~~NPM(Deprecated)~~
 
 > Deprecated: `npm uninstall -g` does not trigger the `preuninstall` event and therefore cannot delete the global binary file.
 
