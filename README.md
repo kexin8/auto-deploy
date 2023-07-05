@@ -21,7 +21,7 @@
 > describe
 > the features and advantages of this tool in the introduction.
 
-### 🏠 [Homepage](https://github.com/kexin8/auto-deploy#readme) | [中文文档](https://github.com/kexin8/auto-deploy#README_CN.md)
+### 🏠 [Homepage](https://github.com/kexin8/auto-deploy#readme) | [中文文档](https://github.com/kexin8/auto-deploy/blob/master/README_CN.md)
 
 ## Prerequisites
 
