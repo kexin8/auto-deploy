@@ -9,6 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
+        with:
+          always-auth: true
       - run: yarn --ignore-scripts
       - run: yarn publish
         env:

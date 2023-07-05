@@ -1,6 +1,6 @@
 {
   "name": "@kexin88/deploy-cli",
-  "version": "1.3.0-pre-7",
+  "version": "1.3.0-pre-3",
   "description": "“Deploy CLI” is a one-click deployment CLI tool that allows users to deploy programs to servers with just one command based on their configurations. This tool can help users quickly deploy programs and improve efficiency. You can describe the features and advantages of this tool in the introduction. ",
   "main": "index.js",
   "scripts": {
