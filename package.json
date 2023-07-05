@@ -1,0 +1,49 @@
+{
+  "name": "@kexin88/deploy-cli",
+  "version": "1.3.0-pre-2",
+  "description": "“Deploy CLI” is a one-click deployment CLI tool that allows users to deploy programs to servers with just one command based on their configurations. This tool can help users quickly deploy programs and improve efficiency. You can describe the features and advantages of this tool in the introduction. ",
+  "main": "index.js",
+  "bin": {
+    "deploy": "index.js"
+  },
+  "scripts": {
+    "postinstall": "node index.js install",
+    "preuninstall": "node index.js uninstall"
+  },
+  "binary": {
+    "name": "deploy",
+    "version": "1.3.0-pre",
+    "proxy": "https://ghproxy.com",
+    "url": "https://github.com/kexin8/auto-deploy/releases/download/v{{version}}/deploy_{{os}}_{{arch}}.{{ext}}"
+  },
+  "files": [
+    "index.js",
+    "package.json"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kexin8/auto-deploy.git"
+  },
+  "keywords": [
+    "deploy",
+    "deploy-cli",
+    "auto",
+    "auto-deploy",
+    "cli"
+  ],
+  "author": "kexin8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kexin8/auto-deploy/issues"
+  },
+  "homepage": "https://github.com/kexin8/auto-deploy#readme",
+  "dependencies": {
+    "request": "^2.88.2",
+    "tar": "^6.1.15",
+    "unzipper": "^0.10.14"
+  }
+}

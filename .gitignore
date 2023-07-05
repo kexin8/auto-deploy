@@ -25,5 +25,5 @@ go.work
 dyconfig.json
 
 # goreleaser
-dest/
+dist/
 node_modules/

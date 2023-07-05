@@ -30,10 +30,11 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Publish binary file to npm
-#        env:
-#          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-#        run: |
-#          cd release
-#          npm publish --access public
+      - name: Publish binary file to npm
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        run: |
+          # 将 tag version 写入 package.json的 version 字段
+          npm version ${{ github.ref }}
+          npm publish
 
