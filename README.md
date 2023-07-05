@@ -1,175 +1,127 @@
+<h1 align="center">Welcome to deploy-cli 👋</h1>
+<p>
+  <a href="https://www.npmjs.com/package/deploy-cli" target="_blank">
+    <img alt="Version" src="https://img.shields.io/npm/v/deploy-cli.svg">
+  </a>
+  <img src="https://img.shields.io/badge/node-%3E%3D16.0.0-blue.svg" />
+  <img src="https://img.shields.io/badge/npm-%3E%3D7.0.0-blue.svg" />
+  <a href="https://github.com/kexin8/auto-deploy#readme" target="_blank">
+    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
+  </a>
+  <a href="https://github.com/kexin8/auto-deploy/graphs/commit-activity" target="_blank">
+    <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
+  </a>
+  <a href="https://github.com/kexin8/auto-deploy/blob/master/LICENSE" target="_blank">
+    <img alt="License: ISC" src="https://img.shields.io/github/license/kexin8/deploy-cli" />
+  </a>
+</p>
 
-## 用法
+> “Deploy CLI” is a one-click deployment CLI tool that allows users to deploy programs to servers with just one command
+> based on their configurations. This tool can help users quickly deploy programs and improve efficiency. You can
+> describe
+> the features and advantages of this tool in the introduction.
 
-```shell
-# 初始化配置
-deploy init [-a]
-# 修改配置文件
-vim dyconfig.json
-# 执行
-deploy
+### 🏠 [Homepage](https://github.com/kexin8/auto-deploy#readme) | [中文文档](https://github.com/kexin8/auto-deploy#README_CN.md)
+
+## Prerequisites
+
+> This parameter is applicable only to the yarn method. Other methods are not applicable
+
+- node >=16.0.0
+- npm >=7.0.0
+
+## Install
+
+### Yarn(Recommended)
+
+```sh
+yarn global add @kexin88/deploy-cli
 ```
 
-## 安装
+### NPM(Deprecated)
 
-### 脚本安装（推荐）
+> Deprecated: `npm uninstall -g` does not trigger the `preuninstall` event and therefore cannot delete the global binary file.
 
-#### Window
+### Script Install
 
-##### PowerShell
+#### Linux && MacOS
 
-```shell
-# Optional: Needed to run a remote script the first time
-# 可选：第一次运行远程脚本时需要
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 | iex
-# if you can't access github, you can use proxy
-# 如果访问github很慢，可以使用镜像代理
-irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
-```
-
-*国内访问*
-```shell
-# 可选：第一次运行远程脚本时需要
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install_ZH-CN.ps1 | iex
-```
-
-#### Linux & Mac
 ```shell
 curl -fsSL https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh
 ```
 
-*国内访问*
+**China mainland users can use the following command to speed up the download**
+
 ```shell
 curl -fsSL https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install.sh | sh -s https://ghproxy.com
 ```
 
-### 手动下载
+#### Windows (PowerShell)
 
-#### Window
-
-##### PowerShell（推荐）
-```shell
-# 下载
-wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/deploy-windows-amd64.tgz
-
-# 解压
-tar -xvzf deploy-windows-amd64.tgz -C /your/path
-# 设置环境变量
-[environment]::SetEnvironmentvariable("PATH", "$([environment]::GetEnvironmentvariable("Path", "User"));/your/path", "User")
+```powershell
+# Optional: Needed to run a remote script the first time
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 | iex
+# if you can't access github, you can use proxy
+irm https://github.com/kexin8/auto-deploy/releases/download/install/install.ps1 -Proxy '<host>:<ip>' | iex
 ```
 
-##### Cmd
+**China mainland users can use the following command to speed up the download**
 
-```shell
-# 下载
-wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/deploy-windows-amd64.tgz
-
-# 解压
-tar -xvzf deploy-windows-amd64.tgz -C /your/path
-# 手动添加环境变量
+```powershell
+# Optional: Needed to run a remote script the first time
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm https://ghproxy.com/https://github.com/kexin8/auto-deploy/releases/download/install/install_ZH-CN.ps1 | iex
 ```
 
+## Usage
 
-
-#### Linux
-
-```shell
-# 下载
-wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/deploy-linux-amd64.tgz
-# 解压
-tar -zxvf deploy-linux-x64.tgz -C /your/path/
-# 设置环境变量（追加）
-export PATH=$PATH:/your/path
+```sh
+deploy --version
 ```
 
-### Mac
-```shell
-# 下载
-wget https://github.com/kexin8/auto-deploy/releases/download/{latest-version}/deploy-darwin-amd64.tgz
-# 解压
-tar -zxvf deploy-darwin-amd64.tgz -C /your/path/
-# 设置环境变量
-export PATH=$PATH:/your/path
-```
+## Commands
 
-## 命令说明
+### Init Config
 
-#### init
-
-> 初始化配置
-
-`deploy init`会再当前路径下创建一个名为`dyconfig.json`的配置文件
+Run `deploy init` command to initialize the configuration file.
+The configuration file is located in the current directory. The default name is `dyconfig.json`.
+If you want to all the configuration file to be named `dyconfig.json`, you can add `-a` parameter.
+Detailed configuration file description can be found in [Configuration](#Configuration).
+**Example:**
 
 ```shell
-# init dyconfig.json
-> deploy init
-# Or select Display all configurations
-> deploy init -a
-```
-
-dyconfig.json
-
-```json
-{
-	"address": "localhost:22",
-	"username": "your_username",
-	"password": "your_password",
-	"publicKey": "your_pubkey",
-	"publicKeyPath": "your_pubkey_path",
-	"timeout": 10,
-	"srcFile": "your need to deploy file",
-	"targetDir": "remote target dir",
-	"preCmd": [
-		"Before uploading a file"
-	],
-	"postCmd": [
-		"After uploading the file"
-	]
-}
-```
-
-**配置说明**
-
-| 名称          | 必填 | 说明                                 | 样例         |
-| ------------- | ---- | ------------------------------------ | ------------ |
-| address       | Y    | 服务器地址<br />`<host>:<ip>`        | localhost:22 |
-| username      | Y    | 用户名                               |              |
-| password      | N    | 密码                                 |              |
-| publicKey     | N    | 公钥                                 |              |
-| publicKeyPath | N    | 公钥文件路径                         |              |
-| timeout       | N    | 超时时间，单位s，默认10s             |              |
-| srcFile       | Y    | 需要上传的文件路径，多个使用逗号分隔 |              |
-| targetDir     | Y    | 服务器目标路径                       |              |
-| preCmd        | N    | 上传文件前需要执行的命令             |              |
-| postCmd       | N    | 上传后需要执行的命令                 |              |
-
-#### version
-
-> 查看版本
-
-```shell
-> deploy version
->
-deploy version v0.2.4 windows/amd64
-```
-
-
-
-#### help
-
-> 帮助
-
-```shell
-> deploy --help
+deploy init
 # or
-> deploy -h
+deploy init -a
+```
+
+### Deploy Program
+
+Run `deploy` command to deploy program to server.
+The configuration file is located in the current directory. The default name is `dyconfig.json`.
+**Example:**
+
+```shell
+deploy
+# or
+deploy /path/to/dyconfig.json
+```
+
+### More
+
+More commands can be found by running `deploy --help` or `deploy -h` command.
+
+```shell
+$ deploy -h
 NAME:
    deploy - this is a simple cli app that automates deploy
 
 USAGE:
    deploy [\path\to\config.json]
+
+VERSION:
+   v1.3.0-pre
 
 DESCRIPTION:
    This is a simple cli app that automates deploy.
@@ -179,11 +131,69 @@ DESCRIPTION:
      deploy \path\to\config.json
 
 COMMANDS:
-   init
-   version, v  Show version
-   help, h     Shows a list of commands or help for one command
+   init     
+   upgrade  upgrade deploy
+   help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h  show help
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
+## Configuration
+
+The configuration file is a json file, which can be generated by running `deploy init` command.
+
+| Field         | Type     | Required | Description                                                                          |
+|---------------|----------|----------|--------------------------------------------------------------------------------------|
+| address       | string   | true     | The address of the server to be deployed.                                            |
+| username      | string   | true     | The username of the server to be deployed.                                           |
+| password      | string   | true     | The password of the server to be deployed.                                           |
+| srcFile       | string   | true     | The path of the file to be deployed. allow multiple files to be separated by commas. |
+| workDir       | string   | false    | The path of the directory to be deployed.                                            |
+| changeWorkDir | boolean  | false    | Whether to change the working directory.                                             |
+| preCmd        | string[] | false    | The commands to be executed before deployment.                                       |
+| postCmd       | string[] | false    | The commands to be executed after deployment.                                        |
+
+**Example:**
+
+```yaml
+{
+  "address": "127.0.0.1:22",
+  "username": "username",
+  "password": "password",
+  "srcFile": "file1,file2,...",
+  "workDir": "/path/to/workDir",
+  "changeWorkDir": true,
+  "preCmd": [
+    "echo 'preCmds'"
+  ],
+  "postCmd": [
+    "echo 'postCmds'"
+  ]
+}
+```
+
+## Author
+
+👤 **kexin8**
+
+* Github: [@kexin8](https://github.com/kexin8)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!<br />Feel free to
+check [issues page](https://github.com/kexin8/auto-deploy/issues). You can also take a look at
+the [contributing guide](https://github.com/kexin8/auto-deploy/blob/master/CONTRIBUTING.md).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+## 📝 License
+
+Copyright © 2023 [kexin8](https://github.com/kexin8).<br />
+This project is [ISC](https://github.com/kexin8/auto-deploy/blob/master/LICENSE) licensed.
+
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
