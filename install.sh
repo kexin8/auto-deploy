@@ -56,7 +56,7 @@ if [ $arch != "x86_64" ] && [ $arch != "arm64" ]; then
   exit 1
 fi
 
-DownloadUrl="$URL/deploy_$os_$arch.tar.gz"
+DownloadUrl="$URL/deploy_"$os"_"$arch".tar.gz"
 info "download $DownloadUrl to $DEPLOY_DIR"
 
 tarFileTmpDir=$DEPLOY_DIR/tmp
@@ -75,7 +75,7 @@ curl $DownloadUrl | tar -zxf - -C $tarFileTmpDir
 check "download $DownloadUrl failed"
 
 # 复制文件到目标目录
-cp $tarFileTmpDir/deploy_$os_$arch/* $DEPLOY_DIR
+cp $tarFileTmpDir/deploy_"$os"_"$arch"/* $DEPLOY_DIR
 
 # 删除临时目录
 rm -rf $tarFileTmpDir
