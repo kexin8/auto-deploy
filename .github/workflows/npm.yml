@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'package.json'
+      - '**/npm.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,6 +13,7 @@ jobs:
         with:
           always-auth: true
       - run: yarn --ignore-scripts
+      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - run: yarn publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
