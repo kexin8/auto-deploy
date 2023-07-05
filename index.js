@@ -219,8 +219,12 @@ async function uninstall() {
 
     const installPath = await getInstallPath()
 
+    console.log(`Uninstalling ${opts.name} from ${installPath} ...`)
+
     if (!fs.existsSync(path.join(installPath, opts.name))) {
-        throw new Error("Binary is not install")
+        // throw new Error("Binary is not install")
+        console.warn("Binary is not install")
+        return
     }
 
     fs.unlinkSync(path.join(installPath, opts.name))

@@ -1,0 +1,15 @@
+name: NPM
+on:
+  push:
+    paths:
+      - 'package.json'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+      - run: yarn
+      - run: yarn npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

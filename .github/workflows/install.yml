@@ -6,8 +6,9 @@ name: Install
 on:
   push:
     paths:
-      - 'install*.ps1'
-      - 'install*.sh'
+      - 'install.ps1'
+      - 'install_ZH-CN.ps1'
+      - 'install.sh'
 
 jobs:
 
