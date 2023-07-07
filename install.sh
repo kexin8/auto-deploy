@@ -51,7 +51,11 @@ fi
 
 # 获取当前系统架构 x86_64 or arm64
 arch=$(uname -m)
-if [ $arch != "x86_64" ] && [ $arch != "arm64" ]; then
+if [ $arch == "x86_64" ]; then
+  arch="amd64"
+elif [ $arch == "arm64" ]; then
+  arch="arm64"
+else
   error "不支持的架构 $arch"
   exit 1
 fi
