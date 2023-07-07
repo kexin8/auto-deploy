@@ -1,7 +1,7 @@
 <h1 align="center">Welcome to deploy-cli 👋</h1>
 <p>
-  <a href="https://www.npmjs.com/package/deploy-cli" target="_blank">
-    <img alt="Version" src="https://img.shields.io/npm/v/deploy-cli.svg">
+  <a href="https://www.npmjs.com/package/@kexin88/deploy-cli" target="_blank">
+    <img alt="Version" src="https://img.shields.io/npm/v/@kexin88/deploy-cli.svg">
   </a>
   <img src="https://img.shields.io/badge/node-%3E%3D16.0.0-blue.svg" />
   <img src="https://img.shields.io/badge/npm-%3E%3D7.0.0-blue.svg" />
